@@ -1,0 +1,80 @@
+---
+import { getEmDashCollection, getEmDashEntry, getMenuWithCacheHint, getSiteSettings } from "emdash";
+import { PortableText } from "emdash/ui";
+import Base from "../layouts/Base.astro";
+import { resolveStarterSiteIdentity } from "../utils/site-identity";
+import { formatDate } from "../utils/date";
+
+// トップの自己紹介は Pages コレクションの "home"、リンク集は "links" メニューから読む。
+const [intro, postsResult, linksResult, settings] = await Promise.all([
+	getEmDashEntry("pages", "home"),
+	getEmDashCollection("posts", { orderBy: { published_at: "desc" }, limit: 5 }),
+	getMenuWithCacheHint("links"),
+	getSiteSettings(),
+]);
+const home = intro.entry;
+const posts = postsResult.entries;
+const links = linksResult.data?.items ?? [];
+const { siteTitle, siteTagline } = resolveStarterSiteIdentity(settings);
+if (Astro.cache?.enabled) {
+	Astro.cache.set(intro.cacheHint);
+	Astro.cache.set(postsResult.cacheHint);
+	Astro.cache.set(linksResult.cacheHint);
+}
+---
+
+<Base title={siteTitle} description={siteTagline} content={home ? { collection: "pages", id: home.data.id, slug: "home" } : undefined}>
+	<section class="intro">
+		{home ? (
+			<>
+				<h1 {...home.edit.title}>{home.data.title}</h1>
+				<div {...home.edit.content}><PortableText value={home.data.content} /></div>
+			</>
+		) : (
+			<>
+				<h1>{siteTitle}</h1>
+				<p>{siteTagline}</p>
+			</>
+		)}
+
+		{links.length > 0 && (
+			<ul class="links">
+				{links.map((item) => (
+					<li>
+						<a href={item.url} target={item.target} rel={item.target === "_blank" ? "noopener noreferrer" : undefined}>
+							{item.label} ↗
+						</a>
+					</li>
+				))}
+			</ul>
+		)}
+	</section>
+
+	<div class="section-head">
+		<h2>最近の記事</h2>
+		<a href="/posts">すべて見る →</a>
+	</div>
+
+	{posts.length === 0 ? (
+		<p class="meta">まだ記事がありません。</p>
+	) : (
+		<ul class="post-list">
+			{posts.map((post) => (
+				<li>
+					{post.data.publishedAt && (
+						<time class="meta" datetime={post.data.publishedAt.toISOString()}>{formatDate(post.data.publishedAt)}</time>
+					)}
+					<h3><a class="title" href={`/posts/${post.id}`} {...post.edit.title}>{post.data.title}</a></h3>
+					{post.data.excerpt && <p {...post.edit.excerpt}>{post.data.excerpt}</p>}
+				</li>
+			))}
+		</ul>
+	)}
+</Base>
+
+<style>
+	.intro h1 { font-size: 2rem; }
+	.intro :global(p) { margin: 0.75rem 0; }
+	.links { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; list-style: none; margin: 1.5rem 0 0; padding: 0; }
+	.links a { color: var(--accent); text-decoration: none; font-weight: 600; }
+</style>
