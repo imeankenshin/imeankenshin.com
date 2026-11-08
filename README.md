@@ -49,22 +49,26 @@ DATABASE_URL="$(neon connection-string production --project-id young-scene-04976
   --role-name emdash --database-name emdash)" pnpm cf:hyperdrive:create
 ```
 
-### 初回デプロイ（1回だけ、続けて行う）
+### 公開先
+
+- サイト: https://imeankenshin.com （`wrangler.jsonc` の `routes` で Worker の独自ドメインに設定）
+- 管理画面: https://imeankenshin.com/_emdash/admin/
+- `workers_dev` とプレビュー URL は無効。別のアドレスから管理画面に入れないようにし、
+  パスキーのドメインを `imeankenshin.com` に揃えるため。
+
+### 初回デプロイ（実施済み。作り直すときの手順）
 
 デプロイ直後の管理画面は「最初に開いた人が管理者になれる」セットアップ画面なので、
 1〜4 は間を空けずに行う。
 
-1. `pnpm deploy` — 出力される `https://imeankenshin-com.<サブドメイン>.workers.dev` を控える
+1. `pnpm deploy`
 2. 暗号鍵を生成して控え（パスワードマネージャー）、`cf` で登録
    ```bash
    npx emdash secrets generate
    EMDASH_ENCRYPTION_KEY='生成した値' pnpm cf:secrets
    ```
-3. `https://…workers.dev/_emdash/admin/` でセットアップ（パスキー登録）
+3. https://imeankenshin.com/_emdash/admin/ でセットアップ（パスキー登録）
 4. 管理画面で編集 → 公開し、公開ページに反映されることを確認
-
-パスキーはセットアップしたドメインに紐づく。独自ドメインを先に使いたい場合は、
-ドメインを Cloudflare に追加し `wrangler.jsonc` の `routes` を設定してから 1 を行う。
 
 ### 2 回目以降
 

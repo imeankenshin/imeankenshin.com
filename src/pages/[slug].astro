@@ -10,8 +10,13 @@ if (!slug) {
 	return Astro.rewrite("/404");
 }
 
-// "home" ページはトップ (/) に表示する
+// "home" ページはトップ (/) に表示する。
+// プレビュー（?_preview=トークン）は管理画面から /home?_preview=… で開かれるため、
+// クエリを保ったまま内部でトップを描画する。通常アクセスは恒久リダイレクト。
 if (slug === "home") {
+	if (Astro.url.searchParams.has("_preview")) {
+		return Astro.rewrite(`/${Astro.url.search}`);
+	}
 	return Astro.redirect("/", 301);
 }
 

@@ -8,6 +8,23 @@
 	--font-body: "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif;
 	--font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 	--measure: 40rem;
+
+	/* LiveSearch（emdash/ui/search）の配色をサイトのトークンに合わせる。
+	   既定は白背景で、ダークモードだと文字が読めなくなる */
+	--emdash-search-bg: var(--bg);
+	--emdash-search-text: var(--fg);
+	--emdash-search-muted: var(--muted);
+	--emdash-search-border: var(--line);
+	--emdash-search-border-focus: var(--muted);
+	--emdash-search-hover: color-mix(in srgb, var(--fg) 7%, var(--bg));
+	--emdash-search-highlight: var(--accent);
+
+	/* Portable Text のブロック（表・コード・ギャラリーなど）が参照する色。
+	   未定義だと明るい既定色になり、ダークモードで文字が読めなくなる */
+	--color-surface: color-mix(in srgb, var(--fg) 8%, var(--bg));
+	--color-bg-subtle: color-mix(in srgb, var(--fg) 4%, var(--bg));
+	--color-border: var(--line);
+	--color-muted: var(--muted);
 }
 @media (prefers-color-scheme: dark) {
 	:root {

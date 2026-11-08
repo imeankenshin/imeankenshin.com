@@ -51,55 +51,35 @@ Cloudflare Workers + Hyperdrive (PostgreSQL) + R2. See README.md. Use Wrangler f
 - When Astro's cache is enabled, pass content-query hints to `Astro.cache.set(cacheHint)`. Use the `WithCacheHint` variants for site settings, menus, taxonomies, and widget areas rendered by cached routes.
 - Taxonomy names in queries must match the seed's `"name"` field exactly (e.g., `"category"` not `"categories"`).
 
-## This Template
+## This Site
 
-A general-purpose starting point with posts, pages, categories, and tags. Less opinionated than the themed templates -- a base for sites that want to define their own design.
-
-There is intentionally no `theme.css`, no custom font configuration, no styled layouts beyond browser defaults. The home, posts index, post detail, page, category, and tag pages all render with minimal styling. Start here if you want full control over the visual language; start with `blog`, `portfolio`, or `marketing` if you want a designed template to customise.
+Kenshin's personal site + blog, built from the EmDash Starter template and customized: Japanese UI, a minimal
+single-column design (`src/styles/theme.css`), an editable home page (`home` page entry + `links` menu), and
+Cloudflare Workers deployment. Extend the existing design tokens instead of introducing a second theme.
 
 ## Pages
 
-| Page        | Path               | What it shows                                  |
-| ----------- | ------------------ | ---------------------------------------------- |
-| Home        | `/`                | Site title + tagline, links into Posts / About |
-| All posts   | `/posts`           | Post list                                      |
-| Post detail | `/posts/[slug]`    | Post content                                   |
-| Page        | `/[slug]`          | Static page content (e.g. `/about`)            |
-| Category    | `/category/[slug]` | Posts filtered by category                     |
-| Tag         | `/tag/[slug]`      | Posts filtered by tag                          |
+| Page        | Path               | What it shows                                                        |
+| ----------- | ------------------ | -------------------------------------------------------------------- |
+| Home        | `/`                | Intro from the `home` page entry, `links` menu, 5 latest posts       |
+| All posts   | `/posts`           | Post list with tags (cursor pagination)                              |
+| Post detail | `/posts/[slug]`    | Post content (`pageType="article"`)                                  |
+| Page        | `/[slug]`          | Static page content (e.g. `/about`); `/home` redirects to `/`        |
+| Category    | `/category/[slug]` | Posts filtered by category (hierarchical; lookup walks the tree)     |
+| Tag         | `/tag/[slug]`      | Posts filtered by tag                                                |
 
 ## Schema
 
 - `posts` collection: `title`, `featured_image`, `content` (Portable Text), `excerpt` (text).
-- `pages` collection: `title`, `content` (Portable Text).
-- Taxonomies: `category`, `tag`.
-- Single `primary` menu.
+- `pages` collection: `title`, `content` (Portable Text). The `home` entry is the home page intro.
+- Taxonomies: `category` (hierarchical), `tag`.
+- Menus: `primary` (header nav) and `links` (home page link list).
 
 Site settings have `title` and `tagline`.
 
-## Visual character
+## Design
 
-None imposed. Define your own.
-
-This template ships without:
-
-- `src/styles/theme.css` -- create one and import it from `Base.astro` if you want CSS-variable theming.
-- Fonts in `astro.config.mjs` -- the `fonts:` array is empty. Add Google Fonts entries with `cssVariable` bindings if you want web fonts.
-- A `components/` directory with styled cards / tag lists / etc. -- build them as needed.
-
-## What to do here
-
-If you're customising this template, the work is to add design, not to subtract it. Reasonable first moves:
-
-1. Decide on one display + one body typeface, add them to `astro.config.mjs`, bind them to `--font-display` and `--font-body` CSS variables.
-2. Create `src/styles/theme.css` with your colour palette, type scale, and spacing tokens.
-3. Import it from `Base.astro`, then add any page-specific styles in the relevant Astro page.
-4. Build page-specific styles in each Astro page's `<style>` block, referencing the CSS variables.
-
-If you want a designed template instead, switch to `blog`, `portfolio`, or `marketing` -- each ships with a full visual system you can re-skin via `theme.css`.
-
-## What not to do
-
-- Don't treat this as a finished design. The unstyled output is intentional; shipping it as-is looks unfinished because it is.
-- Don't add component libraries (Tailwind UI, shadcn, etc.) without considering what they bring with them. The template is small on purpose.
-- Don't recreate the blog template's three-column reading view here. If that's what you want, start from `blog`.
+Japanese UI (`lang="ja"`). Dates use `formatDate()` in `src/utils/date.ts` (ja-JP, Asia/Tokyo — Workers run in UTC).
+Design tokens live in `src/styles/theme.css` (imported by `Base.astro`), with light/dark via `prefers-color-scheme`.
+Page-specific styles go in each page's `<style>` block and reference the CSS variables.
+Don't add component libraries without a reason; the site is small on purpose.

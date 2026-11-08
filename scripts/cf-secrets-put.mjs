@@ -6,18 +6,22 @@
 // 鍵は `npx emdash secrets generate` で生成し、パスワードマネージャー等に必ず控えること。
 // 失うとプラグインの保存済みシークレットを復号できなくなる。
 // Worker が存在している必要があるため、初回 `pnpm deploy` の後に実行する。
-import { execFileSync } from "node:child_process";
+// 鍵は引数ではなく一時ファイル経由で cf に渡す（scripts/lib/cf.mjs）。
+import { cfWithBody, exitWithError } from "./lib/cf.mjs";
 
 const WORKER = process.env.WORKER_NAME ?? "imeankenshin-com";
-const key = process.env.EMDASH_ENCRYPTION_KEY;
-if (!key) {
-	console.error("EMDASH_ENCRYPTION_KEY を指定してください（npx emdash secrets generate で生成）");
-	process.exit(1);
-}
+const NAME = "EMDASH_ENCRYPTION_KEY";
 
-execFileSync(
-	"cf",
-	["workers", "secrets", "update", "EMDASH_ENCRYPTION_KEY", "--worker", WORKER, "--type", "secret_text", "--text", key],
-	{ stdio: ["ignore", "ignore", "inherit"] },
-);
-console.log(`Worker "${WORKER}" に EMDASH_ENCRYPTION_KEY を登録しました。`);
+try {
+	const key = process.env[NAME];
+	if (!key) throw new Error(`${NAME} を指定してください（npx emdash secrets generate で生成）`);
+
+	const dryRun = process.argv.includes("--dry-run");
+	const out = cfWithBody(
+		["workers", "secrets", "update", NAME, "--worker", WORKER, ...(dryRun ? ["--dry-run"] : [])],
+		{ name: NAME, type: "secret_text", text: key },
+	);
+	console.log(dryRun ? out : `Worker "${WORKER}" に ${NAME} を登録しました。`);
+} catch (error) {
+	exitWithError(error);
+}

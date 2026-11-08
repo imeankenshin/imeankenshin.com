@@ -14,10 +14,21 @@ interface Props {
 	canonical?: string | null;
 	/** Pass content reference for plugin page contributions on content pages */
 	content?: { collection: string; id: string; slug?: string | null };
+	/** "article" for blog posts (og:type=article + BlogPosting JSON-LD); others are "website" */
+	pageType?: "website" | "article";
+	articleMeta?: { publishedTime?: string | null; modifiedTime?: string | null };
 }
 
-const { title, pageTitle, description, image, canonical, content } =
-	Astro.props;
+const {
+	title,
+	pageTitle,
+	description,
+	image,
+	canonical,
+	content,
+	pageType = "website",
+	articleMeta,
+} = Astro.props;
 const [settingsResult, menuResult] = await Promise.all([
 	getSiteSettingsWithCacheHint(),
 	getMenuWithCacheHint("primary"),
@@ -41,7 +52,8 @@ const menu = menuResult.data;
 const pageCtx = createPublicPageContext({
 	Astro,
 	kind: content ? "content" : "custom",
-	pageType: "website",
+	pageType,
+	articleMeta,
 	title: fullTitle,
 	pageTitle: pageTitle ?? title,
 	description: pageDescription,
@@ -92,7 +104,15 @@ const pageCtx = createPublicPageContext({
 						))
 					}
 				</nav>
-				<LiveSearch placeholder="検索…" collections={["posts", "pages"]} />
+				<LiveSearch
+					placeholder="検索…"
+					collections={["posts", "pages"]}
+					routeMap={{ posts: "/posts/:slug", pages: "/:slug" }}
+				>
+					<!-- クラス名は LiveSearch のスクリプトが要素を探すのに使うので変えない -->
+					<div slot="loading" class="emdash-live-search-loading">検索中…</div>
+					<div slot="no-results" class="emdash-live-search-no-results">見つかりませんでした</div>
+				</LiveSearch>
 			</div>
 		</header>
 
