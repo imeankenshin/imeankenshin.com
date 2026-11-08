@@ -1,0 +1,31 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "imeankenshin-com",
+	"main": "./src/worker.ts",
+	"compatibility_date": "2026-02-24",
+	"compatibility_flags": ["nodejs_compat"],
+	"hyperdrive": [
+		{
+			"binding": "HYPERDRIVE",
+			// `pnpm cf:hyperdrive:create` で作成した ID に置き換える
+			"id": "REPLACE_WITH_HYPERDRIVE_ID",
+			// ローカル開発用（docker compose の Postgres）。本番では使われない
+			"localConnectionString": "postgres://emdash:emdash@localhost:55432/emdash",
+		},
+	],
+	"r2_buckets": [
+		{
+			"binding": "MEDIA",
+			"bucket_name": "imeankenshin-media",
+		},
+	],
+	// 予約公開・メンテナンス用（src/worker.ts の scheduled ハンドラ）
+	"triggers": {
+		"crons": ["* * * * *"],
+	},
+	"observability": { "enabled": true },
+	// DB のリージョンが決まったら、Worker を DB の近くで動かす
+	// "placement": { "region": "aws:ap-northeast-1" },
+	// 独自ドメイン（Cloudflare 管理ゾーン）を使うとき
+	// "routes": [{ "pattern": "imeankenshin.com", "custom_domain": true }],
+}

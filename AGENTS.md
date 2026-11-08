@@ -3,7 +3,8 @@ This is an EmDash site -- a CMS built on Astro with a full admin UI.
 ## Commands
 
 ```bash
-pnpm dev              # Start the Astro dev server
+pnpm dev              # Start local Postgres (docker compose) + the Astro dev server
+pnpm deploy           # astro build && wrangler deploy (cf cannot build Astro 7 yet)
 npx emdash types      # Regenerate TypeScript types from a running site
 ```
 
@@ -13,7 +14,11 @@ The admin UI is at `http://localhost:4321/_emdash/admin`.
 
 | File                     | Purpose                                                                            |
 | ------------------------ | ---------------------------------------------------------------------------------- |
-| `astro.config.mjs`       | Astro config with `emdash()` integration, database, and storage                    |
+| `astro.config.mjs`       | Astro config: Cloudflare adapter, Hyperdrive (PostgreSQL) database, R2 storage     |
+| `wrangler.jsonc`         | Worker bindings (HYPERDRIVE, MEDIA), cron trigger, local Postgres connection       |
+| `src/worker.ts`          | Worker entry: Astro handler + scheduled handler (scheduled publishing)             |
+| `compose.yaml`           | Local PostgreSQL for development (`pnpm dev` starts it)                            |
+| `scripts/cf-*.mjs`       | Cloudflare CLI (`cf`) helpers for Hyperdrive creation and Worker secrets           |
 | `src/live.config.ts`     | EmDash loader registration (boilerplate -- don't modify)                           |
 | `seed/seed.json`         | Schema definition + demo content (collections, fields, taxonomies, menus, widgets) |
 | `emdash-env.d.ts`        | Generated types for collections (auto-regenerated on dev server start)             |
@@ -33,6 +38,10 @@ Agent skills are in `.agents/skills/`. Load them when working on specific tasks:
 The EmDash docs are available as an MCP server at `https://docs.emdashcms.com/mcp`. When you need to verify an API, hook, config option, field type, or pattern, call `search_docs` against the live documentation rather than relying on training-data recall. The docs reflect current behaviour; assumptions may not.
 
 This template ships with `.mcp.json`, `.cursor/mcp.json`, and `.vscode/mcp.json` so Claude Code, Cursor, and VS Code auto-discover the docs server. Other tools (OpenCode, Windsurf, etc.) need a manual one-time setup -- see [docs.emdashcms.com/docs-mcp](https://docs.emdashcms.com/docs-mcp).
+
+## Deployment
+
+Cloudflare Workers + Hyperdrive (PostgreSQL) + R2. See README.md. Use Wrangler for build/deploy and the Cloudflare CLI (`cf`) for account/resource commands. Do not run `cf init`, `cf dev`, `cf build`, or `cf deploy` here: the project uses `wrangler.jsonc`, and `cf` does not build Astro 6+ during its beta.
 
 ## Rules
 
