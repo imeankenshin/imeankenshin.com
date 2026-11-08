@@ -1,0 +1,60 @@
+---
+import { getEmDashCollection, getTermsForEntries } from "emdash";
+import Base from "../../layouts/Base.astro";
+import { formatDate } from "../../utils/date";
+
+const cursor = Astro.url.searchParams.get("cursor") || undefined;
+const {
+	entries: posts,
+	cacheHint,
+	nextCursor,
+} = await getEmDashCollection("posts", {
+	orderBy: { published_at: "desc" },
+	limit: 20,
+	cursor,
+});
+if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+
+// タグは一括取得（記事ごとのクエリを避ける）
+const tagsByEntry = await getTermsForEntries(
+	"posts",
+	posts.map((p) => p.data.id),
+	"tag",
+);
+---
+
+<Base title="ブログ">
+	<h1>ブログ</h1>
+
+	{
+		posts.length === 0 ? (
+			<p class="meta">まだ記事がありません。</p>
+		) : (
+			<ul class="post-list" style="margin-top:2rem">
+				{posts.map((post) => {
+					const tags = tagsByEntry.get(post.data.id) ?? [];
+					return (
+						<li>
+							{post.data.publishedAt && (
+								<time class="meta" datetime={post.data.publishedAt.toISOString()}>{formatDate(post.data.publishedAt)}</time>
+							)}
+							<h2><a class="title" href={`/posts/${post.id}`} {...post.edit.title}>{post.data.title}</a></h2>
+							{post.data.excerpt && <p {...post.edit.excerpt}>{post.data.excerpt}</p>}
+							{tags.length > 0 && (
+								<ul class="tags" style="margin-top:0.5rem">
+									{tags.map((t) => (
+										<li><a href={`/tag/${t.slug}`}>{t.label}</a></li>
+									))}
+								</ul>
+							)}
+						</li>
+					);
+				})}
+			</ul>
+		)
+	}
+	<nav class="pager" aria-label="ページ送り">
+		{cursor ? <a href="/posts">← 最初のページ</a> : <span />}
+		{nextCursor && <a href={`/posts?cursor=${encodeURIComponent(nextCursor)}`}>次のページ →</a>}
+	</nav>
+</Base>

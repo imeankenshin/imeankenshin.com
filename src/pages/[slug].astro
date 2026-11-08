@@ -1,0 +1,51 @@
+---
+import { getEmDashEntry, getSeoMeta, decodeSlug, getSiteSettings } from "emdash";
+import { PortableText } from "emdash/ui";
+import Base from "../layouts/Base.astro";
+import { resolveStarterSiteIdentity } from "../utils/site-identity";
+
+const slug = decodeSlug(Astro.params.slug);
+
+if (!slug) {
+	return Astro.rewrite("/404");
+}
+
+// "home" ページはトップ (/) に表示する。
+// プレビュー（?_preview=トークン）は管理画面から /home?_preview=… で開かれるため、
+// クエリを保ったまま内部でトップを描画する。通常アクセスは恒久リダイレクト。
+if (slug === "home") {
+	if (Astro.url.searchParams.has("_preview")) {
+		return Astro.rewrite(`/${Astro.url.search}`);
+	}
+	return Astro.redirect("/", 301);
+}
+
+const { entry: page, cacheHint } = await getEmDashEntry("pages", slug);
+
+if (!page) {
+	return Astro.rewrite("/404");
+}
+
+if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
+const { siteTitle } = resolveStarterSiteIdentity(await getSiteSettings());
+
+const seo = getSeoMeta(page, {
+	siteTitle,
+	siteUrl: Astro.url.origin,
+	path: Astro.url.pathname.replace(/\/$/, ""),
+});
+---
+
+<Base
+	title={seo.title}
+	pageTitle={seo.ogTitle}
+	description={seo.description}
+	canonical={seo.canonical}
+	content={{ collection: "pages", id: page.data.id, slug }}
+>
+	<article>
+		<h1 {...page.edit.title}>{page.data.title}</h1>
+
+		<PortableText value={page.data.content} />
+	</article>
+</Base>

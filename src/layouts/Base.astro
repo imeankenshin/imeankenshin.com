@@ -1,0 +1,131 @@
+---
+import { getMenuWithCacheHint, getSiteSettingsWithCacheHint } from "emdash";
+import { EmDashHead, EmDashBodyStart, EmDashBodyEnd } from "emdash/ui";
+import { createPublicPageContext } from "emdash/page";
+import LiveSearch from "emdash/ui/search";
+import { resolveStarterSiteIdentity } from "../utils/site-identity";
+import "../styles/theme.css";
+
+interface Props {
+	title: string;
+	pageTitle?: string | null;
+	description?: string | null;
+	image?: string | null;
+	canonical?: string | null;
+	/** Pass content reference for plugin page contributions on content pages */
+	content?: { collection: string; id: string; slug?: string | null };
+	/** "article" for blog posts (og:type=article + BlogPosting JSON-LD); others are "website" */
+	pageType?: "website" | "article";
+	articleMeta?: { publishedTime?: string | null; modifiedTime?: string | null };
+}
+
+const {
+	title,
+	pageTitle,
+	description,
+	image,
+	canonical,
+	content,
+	pageType = "website",
+	articleMeta,
+} = Astro.props;
+const [settingsResult, menuResult] = await Promise.all([
+	getSiteSettingsWithCacheHint(),
+	getMenuWithCacheHint("primary"),
+]);
+if (Astro.cache?.enabled) {
+	Astro.cache.set(settingsResult.cacheHint);
+	Astro.cache.set(menuResult.cacheHint);
+}
+
+const { siteTitle, siteTagline, siteLogo } = resolveStarterSiteIdentity(
+	settingsResult.data,
+);
+const titleIncludesSiteName =
+	title === siteTitle ||
+	title.endsWith(` | ${siteTitle}`) ||
+	title.endsWith(` — ${siteTitle}`);
+const fullTitle = titleIncludesSiteName ? title : `${title} — ${siteTitle}`;
+const pageDescription = description ?? siteTagline;
+const menu = menuResult.data;
+
+const pageCtx = createPublicPageContext({
+	Astro,
+	kind: content ? "content" : "custom",
+	pageType,
+	articleMeta,
+	title: fullTitle,
+	pageTitle: pageTitle ?? title,
+	description: pageDescription,
+	canonical,
+	image,
+	content,
+	siteName: siteTitle,
+});
+---
+
+<!doctype html>
+<html lang="ja">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>{fullTitle}</title>
+		<EmDashHead page={pageCtx} />
+	</head>
+	<body>
+		<EmDashBodyStart page={pageCtx} />
+
+		<header class="site-header">
+			<div class="wrap">
+				<a class="site-title" href="/">
+					{
+						siteLogo ? (
+							<img
+								src={siteLogo.url}
+								alt={siteLogo.alt || siteTitle}
+								style="height:32px;width:auto;display:block;"
+							/>
+						) : (
+							siteTitle
+						)
+					}
+				</a>
+				<nav class="site-nav" aria-label="メイン">
+					{
+						menu?.items.map((item) => (
+							<a
+								href={item.url}
+								target={item.target}
+								rel={item.target === "_blank" ? "noopener noreferrer" : undefined}
+								aria-current={Astro.url.pathname === item.url ? "page" : undefined}
+							>
+								{item.label}
+							</a>
+						))
+					}
+				</nav>
+				<LiveSearch
+					placeholder="検索…"
+					collections={["posts", "pages"]}
+					routeMap={{ posts: "/posts/:slug", pages: "/:slug" }}
+				>
+					<!-- クラス名は LiveSearch のスクリプトが要素を探すのに使うので変えない -->
+					<div slot="loading" class="emdash-live-search-loading">検索中…</div>
+					<div slot="no-results" class="emdash-live-search-no-results">見つかりませんでした</div>
+				</LiveSearch>
+			</div>
+		</header>
+
+		<main class="site-main">
+			<div class="wrap">
+				<slot />
+			</div>
+		</main>
+
+		<footer class="site-footer">
+			<div class="wrap">© {new Date().getFullYear()} {siteTitle}</div>
+		</footer>
+
+		<EmDashBodyEnd page={pageCtx} />
+	</body>
+</html>

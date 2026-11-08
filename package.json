@@ -1,0 +1,40 @@
+{
+  "name": "imeankenshin.com",
+  "version": "0.0.3",
+  "private": true,
+  "type": "module",
+  "emdash": {
+    "label": "Starter",
+    "seed": "seed/seed.json"
+  },
+  "scripts": {
+    "db:up": "docker compose up -d --wait",
+    "db:down": "docker compose down",
+    "dev": "docker compose up -d --wait && astro dev",
+    "build": "astro build",
+    "preview": "astro build && wrangler dev",
+    "deploy": "astro build && wrangler deploy",
+    "doctor": "emdash doctor",
+    "typecheck": "astro check",
+    "cf:whoami": "cf auth whoami",
+    "cf:r2:create": "cf r2 buckets create --name imeankenshin-media --location-hint apac",
+    "cf:hyperdrive:create": "node scripts/cf-hyperdrive-create.mjs",
+    "cf:secrets": "node scripts/cf-secrets-put.mjs"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^14.4.6",
+    "@astrojs/react": "^7.0.0",
+    "@emdash-cms/cloudflare": "^1.4.0",
+    "astro": "^7.3.2",
+    "emdash": "^1.3.0",
+    "pg": "^8.23.1",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@cloudflare/workers-types": "^5.20261107.1",
+    "wrangler": "^4.158.0"
+  },
+  "packageManager": "pnpm@11.28.11"
+}

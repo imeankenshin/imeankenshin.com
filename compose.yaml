@@ -1,0 +1,14 @@
+# ローカル開発用 PostgreSQL（本番 DB とは無関係）
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: emdash
+      POSTGRES_PASSWORD: emdash
+      POSTGRES_DB: emdash
+    ports:
+      - "127.0.0.1:55432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:

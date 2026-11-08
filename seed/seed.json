@@ -1,0 +1,297 @@
+{
+	"$schema": "https://emdashcms.com/seed.schema.json",
+	"version": "1",
+	"meta": {
+		"name": "imeankenshin.com",
+		"description": "Kenshin の個人サイト＋ブログ",
+		"author": "Kenshin"
+	},
+	"settings": {
+		"title": "Kenshin",
+		"tagline": "ソフトウェアをつくっています。"
+	},
+	"collections": [
+		{
+			"slug": "posts",
+			"label": "Posts",
+			"labelSingular": "Post",
+			"urlPattern": "/posts/{slug}",
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview",
+				"scheduling",
+				"search",
+				"seo"
+			],
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Title",
+					"type": "string",
+					"required": true,
+					"searchable": true
+				},
+				{
+					"slug": "featured_image",
+					"label": "Featured Image",
+					"type": "image"
+				},
+				{
+					"slug": "content",
+					"label": "Content",
+					"type": "portableText",
+					"searchable": true
+				},
+				{
+					"slug": "excerpt",
+					"label": "Excerpt",
+					"type": "text"
+				}
+			]
+		},
+		{
+			"slug": "pages",
+			"label": "Pages",
+			"labelSingular": "Page",
+			"urlPattern": "/{slug}",
+			"supports": [
+				"drafts",
+				"revisions",
+				"preview",
+				"search",
+				"seo"
+			],
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Title",
+					"type": "string",
+					"required": true,
+					"searchable": true
+				},
+				{
+					"slug": "content",
+					"label": "Content",
+					"type": "portableText",
+					"searchable": true
+				}
+			]
+		}
+	],
+	"taxonomies": [
+		{
+			"name": "category",
+			"label": "Categories",
+			"labelSingular": "Category",
+			"hierarchical": true,
+			"collections": [
+				"posts"
+			],
+			"terms": [
+				{
+					"slug": "general",
+					"label": "雑記"
+				},
+				{
+					"slug": "tech",
+					"label": "技術"
+				}
+			]
+		},
+		{
+			"name": "tag",
+			"label": "Tags",
+			"labelSingular": "Tag",
+			"hierarchical": false,
+			"collections": [
+				"posts"
+			],
+			"terms": [
+				{
+					"slug": "hello",
+					"label": "はじめに"
+				}
+			]
+		}
+	],
+	"menus": [
+		{
+			"name": "primary",
+			"label": "Primary Navigation",
+			"items": [
+				{
+					"type": "custom",
+					"label": "ホーム",
+					"url": "/"
+				},
+				{
+					"type": "custom",
+					"label": "ブログ",
+					"url": "/posts"
+				},
+				{
+					"type": "custom",
+					"label": "About",
+					"url": "/about"
+				}
+			]
+		},
+		{
+			"name": "links",
+			"label": "ホームのリンク集",
+			"items": [
+				{
+					"type": "custom",
+					"label": "GitHub",
+					"url": "https://github.com/imeankenshin",
+					"target": "_blank"
+				}
+			]
+		}
+	],
+	"widgetAreas": [
+		{
+			"name": "sidebar",
+			"label": "Sidebar",
+			"description": "Sidebar widget area",
+			"widgets": [
+				{
+					"type": "component",
+					"componentId": "core:search",
+					"title": "Search"
+				},
+				{
+					"type": "component",
+					"componentId": "core:categories",
+					"title": "Categories"
+				},
+				{
+					"type": "component",
+					"componentId": "core:recent-posts",
+					"title": "Recent Posts",
+					"props": {
+						"count": 5
+					}
+				}
+			]
+		}
+	],
+	"content": {
+		"pages": [
+			{
+				"id": "home",
+				"slug": "home",
+				"status": "published",
+				"data": {
+					"title": "こんにちは、Kenshin です。",
+					"content": [
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "h0",
+							"children": [
+								{
+									"_type": "span",
+									"text": "ここはトップページの自己紹介文です。管理画面の「Pages → home」から自由に書き換えられます。",
+									"_key": "h0s"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "h1",
+							"children": [
+								{
+									"_type": "span",
+									"text": "リンク集は「Menus → ホームのリンク集」、サイト名とキャッチコピーは「Settings」から編集できます。",
+									"_key": "h1s"
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"id": "about",
+				"slug": "about",
+				"status": "published",
+				"data": {
+					"title": "About",
+					"content": [
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "a0",
+							"children": [
+								{
+									"_type": "span",
+									"text": "自分について詳しく書くページです。経歴・興味・連絡先などをここに書いてください。",
+									"_key": "a0s"
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"posts": [
+			{
+				"id": "post-1",
+				"slug": "hello-world",
+				"status": "published",
+				"data": {
+					"title": "ブログをはじめました",
+					"excerpt": "EmDash でサイトを作りました。最初の記事です。",
+					"content": [
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "p0",
+							"children": [
+								{
+									"_type": "span",
+									"text": "このサイトは EmDash（Astro ベースの CMS）で作っています。記事は管理画面から書いて公開できます。",
+									"_key": "p0s"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "h2",
+							"_key": "p1",
+							"children": [
+								{
+									"_type": "span",
+									"text": "これから書くこと",
+									"_key": "p1s"
+								}
+							]
+						},
+						{
+							"_type": "block",
+							"style": "normal",
+							"_key": "p2",
+							"children": [
+								{
+									"_type": "span",
+									"text": "技術メモや日々の雑記を、気が向いたときに書いていきます。",
+									"_key": "p2s"
+								}
+							]
+						}
+					]
+				},
+				"taxonomies": {
+					"category": [
+						"general"
+					],
+					"tag": [
+						"hello"
+					]
+				}
+			}
+		]
+	}
+}
