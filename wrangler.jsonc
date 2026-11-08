@@ -1,31 +1,42 @@
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "imeankenshin-com",
-	"main": "./src/worker.ts",
-	"compatibility_date": "2026-02-24",
-	"compatibility_flags": ["nodejs_compat"],
-	"hyperdrive": [
-		{
-			"binding": "HYPERDRIVE",
-			// `pnpm cf:hyperdrive:create` で作成した ID に置き換える
-			"id": "REPLACE_WITH_HYPERDRIVE_ID",
-			// ローカル開発用（docker compose の Postgres）。本番では使われない
-			"localConnectionString": "postgres://emdash:emdash@localhost:55432/emdash",
-		},
-	],
-	"r2_buckets": [
-		{
-			"binding": "MEDIA",
-			"bucket_name": "imeankenshin-media",
-		},
-	],
-	// 予約公開・メンテナンス用（src/worker.ts の scheduled ハンドラ）
-	"triggers": {
-		"crons": ["* * * * *"],
-	},
-	"observability": { "enabled": true },
-	// DB のリージョンが決まったら、Worker を DB の近くで動かす
-	// "placement": { "region": "aws:ap-northeast-1" },
-	// 独自ドメイン（Cloudflare 管理ゾーン）を使うとき
-	// "routes": [{ "pattern": "imeankenshin.com", "custom_domain": true }],
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "imeankenshin-com",
+  "main": "./src/worker.ts",
+  "compatibility_date": "2026-02-24",
+  "compatibility_flags": ["nodejs_compat"],
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      // `pnpm cf:hyperdrive:create` で作成した ID に置き換える
+      "id": "e3208792404e485fa51315ad5dbe09d2",
+      // ローカル開発用（docker compose の Postgres）。本番では使われない
+      "localConnectionString": "postgres://emdash:emdash@localhost:55432/emdash",
+    },
+  ],
+  // Astro のセッション用（@astrojs/cloudflare が使う）
+  "kv_namespaces": [
+    {
+      "binding": "SESSION",
+      "id": "0bd0f940d1524e60b29f970d47373a45",
+    },
+  ],
+  "r2_buckets": [
+    {
+      "binding": "MEDIA",
+      "bucket_name": "imeankenshin-media",
+    },
+  ],
+  // 予約公開・メンテナンス用（src/worker.ts の scheduled ハンドラ）
+  "triggers": {
+    "crons": ["* * * * *"],
+  },
+  "observability": { "enabled": true },
+  // Worker を Neon (aws-ap-southeast-1) の近くで動かす
+  "placement": { "region": "aws:ap-southeast-1" },
+  // 独自ドメイン（Cloudflare 管理ゾーン）を使うとき
+  "routes": [{ "pattern": "imeankenshin.com", "custom_domain": true }],
+  // 公開は独自ドメインのみ。workers.dev やプレビュー URL を開けると、別のアドレスから
+  // 管理画面（セットアップ画面）に入れてしまい、パスキーのドメインも分かれるため無効にする
+  "workers_dev": false,
+  "preview_urls": false,
 }

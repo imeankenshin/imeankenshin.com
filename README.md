@@ -31,31 +31,40 @@ pnpm dev          # Postgres コンテナを起動してから astro dev
 `.cloudflare/output/v0/config.json` が無いため失敗する）。対応したら `cf migrate` で
 `cloudflare.config.ts` へ移行できる。
 
-### 初回だけ
+### 作成済みのリソース
 
-1. **Postgres を用意する**（Neon / Supabase / PlanetScale Postgres など）。EmDash 用ロールに
-   `CONNECT`、スキーマへの `USAGE, CREATE` を付ける（[要件](https://docs.emdashcms.com/deployment/database/#database-role-requirements)）。
-   有効期限付きロールは使わない（テーブル所有者が変わると移行が失敗する）。
-2. **R2 を有効化する**: Cloudflare ダッシュボードで R2 を一度有効にする（API からは有効化できない）。
-3. **リソース作成（`cf`）**
-   ```bash
-   pnpm cf:whoami
-   pnpm cf:r2:create
-   DATABASE_URL='postgres://USER:PASSWORD@HOST:5432/DB' pnpm cf:hyperdrive:create
-   ```
-   Hyperdrive はクエリキャッシュ無効で作成され、ID が `wrangler.jsonc` に書き込まれる。
-4. **DB の近くで Worker を動かす**: `wrangler.jsonc` の `placement.region` を DB のリージョン（例 `aws:ap-northeast-1`）に合わせて有効化する。
-5. **デプロイ**
-   ```bash
-   pnpm wrangler login   # Wrangler 用の認証（cf のログインとは別）
-   pnpm deploy
-   ```
-6. **暗号鍵を登録（`cf`）**: 本番用に新しく生成して、必ずパスワードマネージャーに控える。
+| リソース | 名前 / ID | 作成方法 |
+|---|---|---|
+| Neon プロジェクト | `imeankenshin.com`（`young-scene-04976765`, aws-ap-southeast-1, PG 18） | 既存 |
+| Neon ロール / DB | `emdash` / `emdash`（ブランチ `production`、DB 所有者 = `emdash`） | `neon roles create` / `neon databases create` |
+| Hyperdrive | `imeankenshin-com-db`（`e3208792…`、キャッシュ無効、Neon の直接接続） | `pnpm cf:hyperdrive:create`（`cf`） |
+| R2 バケット | `imeankenshin-media`（APAC） | `pnpm cf:r2:create`（`cf`） |
+| KV（Astro セッション） | `imeankenshin-com-session` | `cf kv namespaces create` |
+| Worker 配置 | `placement.region = aws:ap-southeast-1`（Neon の近く） | `wrangler.jsonc` |
+
+Hyperdrive を作り直すときは、Neon の直接接続（pooled ではない）URL を渡す:
+
+```bash
+DATABASE_URL="$(neon connection-string production --project-id young-scene-04976765 \
+  --role-name emdash --database-name emdash)" pnpm cf:hyperdrive:create
+```
+
+### 初回デプロイ（1回だけ、続けて行う）
+
+デプロイ直後の管理画面は「最初に開いた人が管理者になれる」セットアップ画面なので、
+1〜4 は間を空けずに行う。
+
+1. `pnpm deploy` — 出力される `https://imeankenshin-com.<サブドメイン>.workers.dev` を控える
+2. 暗号鍵を生成して控え（パスワードマネージャー）、`cf` で登録
    ```bash
    npx emdash secrets generate
    EMDASH_ENCRYPTION_KEY='生成した値' pnpm cf:secrets
    ```
-7. **本番のドメインで**管理画面のセットアップを行う。パスキーはセットアップしたドメインに紐づくため、独自ドメインを使うなら先に `wrangler.jsonc` の `routes` を設定して再デプロイしてから行う。
+3. `https://…workers.dev/_emdash/admin/` でセットアップ（パスキー登録）
+4. 管理画面で編集 → 公開し、公開ページに反映されることを確認
+
+パスキーはセットアップしたドメインに紐づく。独自ドメインを先に使いたい場合は、
+ドメインを Cloudflare に追加し `wrangler.jsonc` の `routes` を設定してから 1 を行う。
 
 ### 2 回目以降
 
