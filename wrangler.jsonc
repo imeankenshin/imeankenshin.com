@@ -35,8 +35,27 @@
   "placement": { "region": "aws:ap-southeast-1" },
   // 独自ドメイン（Cloudflare 管理ゾーン）を使うとき
   "routes": [{ "pattern": "imeankenshin.com", "custom_domain": true }],
-  // 公開は独自ドメインのみ。workers.dev やプレビュー URL を開けると、別のアドレスから
-  // 管理画面（セットアップ画面）に入れてしまい、パスキーのドメインも分かれるため無効にする
+  // 本番は独自ドメインのみ。PR は独立した Worker の workers.dev URL で公開する。
   "workers_dev": false,
   "preview_urls": false,
+  // CLOUDFLARE_ENV=preview でビルド。PR 番号による Worker 名は CI で指定する。
+  "env": {
+    "preview": {
+      "name": "imeankenshin-com-preview",
+      "workers_dev": true,
+      "preview_urls": false,
+      "routes": [],
+      "triggers": { "crons": [] },
+      "vars": { "SITE_PREVIEW": "true" },
+      "hyperdrive": [
+        { "binding": "HYPERDRIVE", "id": "67be4b66e35b4ff99678e0c50f3fc0ad" },
+      ],
+      "kv_namespaces": [
+        { "binding": "SESSION", "id": "67da3e5f5433456786ddca46581d471c" },
+      ],
+      "r2_buckets": [
+        { "binding": "MEDIA", "bucket_name": "imeankenshin-media-preview" },
+      ],
+    },
+  },
 }

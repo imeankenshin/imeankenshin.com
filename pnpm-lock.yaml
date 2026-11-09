@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  '@napi-rs/wasm-runtime@1.2.4>@emnapi/runtime': 1.11.3
+
 importers:
 
   .:
@@ -16,13 +19,13 @@ importers:
         version: 7.1.4(@types/node@26.6.6)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(esbuild@0.28.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(yaml@2.9.1)
       '@emdash-cms/cloudflare':
         specifier: ^1.4.0
-        version: 1.4.0(439d439999f4101ede6c8a65d57734cf)
+        version: 1.4.0(bc5306d71b17b3e3e8f9e5aa1df983f5)
       astro:
         specifier: ^7.3.2
         version: 7.4.7(@types/node@26.6.6)(esbuild@0.28.2)(yaml@2.9.1)
       emdash:
         specifier: ^1.3.0
-        version: 1.4.0(@astrojs/react@7.1.4(@types/node@26.6.6)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(esbuild@0.28.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(yaml@2.9.1))(@atcute/cbor@2.3.8(@atcute/cid@2.5.0))(@atcute/cid@2.5.0)(@atcute/identity@2.0.2(@atcute/lexicons@2.1.1)(typescript@6.0.3))(@date-fns/tz@1.5.0)(@floating-ui/dom@1.8.0)(@tiptap/extensions@3.33.0(@tiptap/core@3.33.0(@tiptap/pm@3.33.0))(@tiptap/pm@3.33.0))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(astro@7.4.7(@types/node@26.6.6)(esbuild@0.28.2)(yaml@2.9.1))(date-fns@4.4.0)(echarts@6.1.0)(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.9)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@6.0.3)
+        version: 1.4.0(@astrojs/react@7.1.4(@types/node@26.6.6)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(esbuild@0.28.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(yaml@2.9.1))(@atcute/cbor@2.3.8(@atcute/cid@2.5.0))(@atcute/cid@2.5.0)(@atcute/identity@2.0.2(@atcute/lexicons@2.1.1)(typescript@6.0.3))(@date-fns/tz@1.5.0)(@floating-ui/dom@1.8.0)(@tiptap/extensions@3.33.0(@tiptap/core@3.33.0(@tiptap/pm@3.33.0))(@tiptap/pm@3.33.0))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(astro@7.4.7(@types/node@26.6.6)(esbuild@0.28.2)(yaml@2.9.1))(date-fns@4.4.0)(echarts@6.1.0)(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.9)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(supports-color@10.2.2)(typescript@6.0.3)
       pg:
         specifier: ^8.23.1
         version: 8.23.1
@@ -35,10 +38,13 @@ importers:
     devDependencies:
       '@astrojs/check':
         specifier: ^0.9.10
-        version: 0.9.12(@emnapi/runtime@2.0.0-beta.2)(prettier@3.9.10)(typescript@6.0.3)
+        version: 0.9.12(@emnapi/runtime@1.11.3)(prettier@3.9.10)(typescript@6.0.3)
       '@cloudflare/workers-types':
         specifier: ^5.20261107.1
         version: 5.20261107.1
+      typescript:
+        specifier: ~6.0.3
+        version: 6.0.3
       wrangler:
         specifier: ^4.158.0
         version: 4.158.0(@cloudflare/workers-types@5.20261107.1)(@types/node@26.6.6)
@@ -1122,7 +1128,7 @@ packages:
     engines: {node: ^20.19.0 || ^22.13.0 || >=23.5.0}
     peerDependencies:
       '@emnapi/core': ^1.7.1 || ^2.0.0-alpha.4
-      '@emnapi/runtime': ^1.7.1 || ^2.0.0-alpha.4
+      '@emnapi/runtime': 1.11.3
 
   '@napi-rs/wasm-runtime@1.2.6':
     resolution: {integrity: sha512-mRyDmEw9/fCDXCGfL1sbgIw/GUK0PVxRW4YwgPN61F3LQ+fSyoBFarJVzgGyhF6kRzEQZ0FejDqm4WLXSeqQmw==}
@@ -3497,16 +3503,22 @@ packages:
     resolution: {integrity: sha512-9K2k72s4n7rV9s4bX0MyjbX9iBribvKZbBJKuEmTCZfeWJXs6Yh7bGpY4eoc7UufAjvpheBqwyZCOIPBvxCv0A==}
     peerDependencies:
       '@volar/language-service': ~2.4.0
+      typescript: '*'
     peerDependenciesMeta:
       '@volar/language-service':
+        optional: true
+      typescript:
         optional: true
 
   volar-service-typescript@0.0.71:
     resolution: {integrity: sha512-yTtM/BVT6hoyEYnDtaCyAtNhdNeS/mhTTABlBOdw3NNiRBUin3IznFJpgfjer4c6RYopiPjjQjc9VFhxVl1mLw==}
     peerDependencies:
       '@volar/language-service': ~2.4.0
+      typescript: '*'
     peerDependenciesMeta:
       '@volar/language-service':
+        optional: true
+      typescript:
         optional: true
 
   volar-service-yaml@0.0.71:
@@ -3707,16 +3719,16 @@ packages:
 
 snapshots:
 
-  '@astrojs/astro2tsx@0.1.3(@emnapi/runtime@2.0.0-beta.2)':
+  '@astrojs/astro2tsx@0.1.3(@emnapi/runtime@1.11.3)':
     dependencies:
       '@emnapi/core': 1.11.3
-      '@napi-rs/wasm-runtime': 1.2.4(@emnapi/core@1.11.3)(@emnapi/runtime@2.0.0-beta.2)
+      '@napi-rs/wasm-runtime': 1.2.4(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)
     transitivePeerDependencies:
       - '@emnapi/runtime'
 
-  '@astrojs/check@0.9.12(@emnapi/runtime@2.0.0-beta.2)(prettier@3.9.10)(typescript@6.0.3)':
+  '@astrojs/check@0.9.12(@emnapi/runtime@1.11.3)(prettier@3.9.10)(typescript@6.0.3)':
     dependencies:
-      '@astrojs/language-server': 2.17.3(@emnapi/runtime@2.0.0-beta.2)(prettier@3.9.10)(typescript@6.0.3)
+      '@astrojs/language-server': 2.17.3(@emnapi/runtime@1.11.3)(prettier@3.9.10)(typescript@6.0.3)
       chokidar: 5.0.0
       kleur: 4.1.5
       typescript: 6.0.3
@@ -3815,9 +3827,9 @@ snapshots:
       unified: 11.0.5
       yaml: 2.9.1
 
-  '@astrojs/language-server@2.17.3(@emnapi/runtime@2.0.0-beta.2)(prettier@3.9.10)(typescript@6.0.3)':
+  '@astrojs/language-server@2.17.3(@emnapi/runtime@1.11.3)(prettier@3.9.10)(typescript@6.0.3)':
     dependencies:
-      '@astrojs/astro2tsx': 0.1.3(@emnapi/runtime@2.0.0-beta.2)
+      '@astrojs/astro2tsx': 0.1.3(@emnapi/runtime@1.11.3)
       '@astrojs/yaml2ts': 0.2.4
       '@volar/kit': 2.4.31(typescript@6.0.3)
       '@volar/language-core': 2.4.31
@@ -3829,8 +3841,8 @@ snapshots:
       volar-service-emmet: 0.0.71(@volar/language-service@2.4.31(typescript@6.0.3))
       volar-service-html: 0.0.71(@volar/language-service@2.4.31(typescript@6.0.3))
       volar-service-prettier: 0.0.71(@volar/language-service@2.4.31(typescript@6.0.3))(prettier@3.9.10)
-      volar-service-typescript: 0.0.71(@volar/language-service@2.4.31(typescript@6.0.3))
-      volar-service-typescript-twoslash-queries: 0.0.71(@volar/language-service@2.4.31(typescript@6.0.3))
+      volar-service-typescript: 0.0.71(@volar/language-service@2.4.31(typescript@6.0.3))(typescript@6.0.3)
+      volar-service-typescript-twoslash-queries: 0.0.71(@volar/language-service@2.4.31(typescript@6.0.3))(typescript@6.0.3)
       volar-service-yaml: 0.0.71(@volar/language-service@2.4.31(typescript@6.0.3))
       vscode-html-languageservice: 5.6.2
       vscode-uri: 3.2.0
@@ -4377,13 +4389,13 @@ snapshots:
       - date-fns
       - zod
 
-  '@emdash-cms/cloudflare@1.4.0(439d439999f4101ede6c8a65d57734cf)':
+  '@emdash-cms/cloudflare@1.4.0(bc5306d71b17b3e3e8f9e5aa1df983f5)':
     dependencies:
       '@astrojs/cloudflare': 14.4.6(@types/node@26.6.6)(astro@7.4.7(@types/node@26.6.6)(esbuild@0.28.2)(yaml@2.9.1))(esbuild@0.28.2)(workerd@1.20261104.1)(wrangler@4.158.0(@cloudflare/workers-types@5.20261107.1)(@types/node@26.6.6))(yaml@2.9.1)
       '@cloudflare/ai-search-snippet': 0.0.42
       '@cloudflare/workers-types': 5.20261107.1
       astro: 7.4.7(@types/node@26.6.6)(esbuild@0.28.2)(yaml@2.9.1)
-      emdash: 1.4.0(@astrojs/react@7.1.4(@types/node@26.6.6)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(esbuild@0.28.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(yaml@2.9.1))(@atcute/cbor@2.3.8(@atcute/cid@2.5.0))(@atcute/cid@2.5.0)(@atcute/identity@2.0.2(@atcute/lexicons@2.1.1)(typescript@6.0.3))(@date-fns/tz@1.5.0)(@floating-ui/dom@1.8.0)(@tiptap/extensions@3.33.0(@tiptap/core@3.33.0(@tiptap/pm@3.33.0))(@tiptap/pm@3.33.0))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(astro@7.4.7(@types/node@26.6.6)(esbuild@0.28.2)(yaml@2.9.1))(date-fns@4.4.0)(echarts@6.1.0)(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.9)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@6.0.3)
+      emdash: 1.4.0(@astrojs/react@7.1.4(@types/node@26.6.6)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(esbuild@0.28.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(yaml@2.9.1))(@atcute/cbor@2.3.8(@atcute/cid@2.5.0))(@atcute/cid@2.5.0)(@atcute/identity@2.0.2(@atcute/lexicons@2.1.1)(typescript@6.0.3))(@date-fns/tz@1.5.0)(@floating-ui/dom@1.8.0)(@tiptap/extensions@3.33.0(@tiptap/core@3.33.0(@tiptap/pm@3.33.0))(@tiptap/pm@3.33.0))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(astro@7.4.7(@types/node@26.6.6)(esbuild@0.28.2)(yaml@2.9.1))(date-fns@4.4.0)(echarts@6.1.0)(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.9)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(supports-color@10.2.2)(typescript@6.0.3)
       jose: 6.2.15
       kysely: 0.29.8
       kysely-d1: 0.4.0(kysely@0.29.8)
@@ -4513,11 +4525,11 @@ snapshots:
   '@emnapi/runtime@1.11.3':
     dependencies:
       tslib: 2.9.1
-    optional: true
 
   '@emnapi/runtime@2.0.0-beta.2':
     dependencies:
       tslib: 2.9.1
+    optional: true
 
   '@emnapi/wasi-threads@1.2.2':
     dependencies:
@@ -4877,18 +4889,18 @@ snapshots:
     dependencies:
       moo: 0.5.3
 
-  '@modelcontextprotocol/sdk@1.32.2(zod@4.5.4)':
+  '@modelcontextprotocol/sdk@1.32.2(supports-color@10.2.2)(zod@4.5.4)':
     dependencies:
       '@hono/node-server': 2.1.6(hono@4.13.17)
       ajv: 8.20.0
-      ajv-formats: 3.0.1(ajv@8.20.0)
+      ajv-formats: 3.0.1
       content-type: 1.0.5
       cors: 2.8.6
       cross-spawn: 7.0.6
       eventsource: 3.0.7
       eventsource-parser: 3.1.1
-      express: 5.3.0
-      express-rate-limit: 8.7.3(express@5.3.0)
+      express: 5.3.0(supports-color@10.2.2)
+      express-rate-limit: 8.7.3(express@5.3.0(supports-color@10.2.2))(supports-color@10.2.2)
       hono: 4.13.17
       jose: 6.2.15
       json-schema-typed: 8.0.2
@@ -4899,10 +4911,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@napi-rs/wasm-runtime@1.2.4(@emnapi/core@1.11.3)(@emnapi/runtime@2.0.0-beta.2)':
+  '@napi-rs/wasm-runtime@1.2.4(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)':
     dependencies:
       '@emnapi/core': 1.11.3
-      '@emnapi/runtime': 2.0.0-beta.2
+      '@emnapi/runtime': 1.11.3
       '@tybys/wasm-util': 0.10.4
 
   '@napi-rs/wasm-runtime@1.2.6(@emnapi/core@2.0.0-beta.2)(@emnapi/runtime@2.0.0-beta.2)':
@@ -5593,8 +5605,8 @@ snapshots:
     optionalDependencies:
       ajv: 8.20.0
 
-  ajv-formats@3.0.1(ajv@8.20.0):
-    optionalDependencies:
+  ajv-formats@3.0.1:
+    dependencies:
       ajv: 8.20.0
 
   ajv-i18n@4.2.0(ajv@8.20.0):
@@ -5732,11 +5744,11 @@ snapshots:
 
   blurhash@2.0.5: {}
 
-  body-parser@2.4.0:
+  body-parser@2.4.0(supports-color@10.2.2):
     dependencies:
       bytes: 3.1.2
       content-type: 2.1.0
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@10.2.2)
       http-errors: 2.0.1
       iconv-lite: 0.7.3
       on-finished: 2.4.2
@@ -5866,9 +5878,11 @@ snapshots:
 
   dayjs@1.11.23: {}
 
-  debug@4.4.3:
+  debug@4.4.3(supports-color@10.2.2):
     dependencies:
       ms: 2.1.3
+    optionalDependencies:
+      supports-color: 10.2.2
 
   defu@6.1.7: {}
 
@@ -5946,7 +5960,7 @@ snapshots:
 
   ee-first@1.1.1: {}
 
-  emdash@1.4.0(@astrojs/react@7.1.4(@types/node@26.6.6)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(esbuild@0.28.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(yaml@2.9.1))(@atcute/cbor@2.3.8(@atcute/cid@2.5.0))(@atcute/cid@2.5.0)(@atcute/identity@2.0.2(@atcute/lexicons@2.1.1)(typescript@6.0.3))(@date-fns/tz@1.5.0)(@floating-ui/dom@1.8.0)(@tiptap/extensions@3.33.0(@tiptap/core@3.33.0(@tiptap/pm@3.33.0))(@tiptap/pm@3.33.0))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(astro@7.4.7(@types/node@26.6.6)(esbuild@0.28.2)(yaml@2.9.1))(date-fns@4.4.0)(echarts@6.1.0)(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.9)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@6.0.3):
+  emdash@1.4.0(@astrojs/react@7.1.4(@types/node@26.6.6)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(esbuild@0.28.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(yaml@2.9.1))(@atcute/cbor@2.3.8(@atcute/cid@2.5.0))(@atcute/cid@2.5.0)(@atcute/identity@2.0.2(@atcute/lexicons@2.1.1)(typescript@6.0.3))(@date-fns/tz@1.5.0)(@floating-ui/dom@1.8.0)(@tiptap/extensions@3.33.0(@tiptap/core@3.33.0(@tiptap/pm@3.33.0))(@tiptap/pm@3.33.0))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(astro@7.4.7(@types/node@26.6.6)(esbuild@0.28.2)(yaml@2.9.1))(date-fns@4.4.0)(echarts@6.1.0)(prosemirror-model@1.25.12)(prosemirror-state@1.4.4)(prosemirror-view@1.42.9)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(supports-color@10.2.2)(typescript@6.0.3):
     dependencies:
       '@astrojs/react': 7.1.4(@types/node@26.6.6)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(esbuild@0.28.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(yaml@2.9.1)
       '@atcute/client': 5.1.2(@atcute/lexicons@2.1.1)(typescript@6.0.3)
@@ -5962,7 +5976,7 @@ snapshots:
       '@emdash-cms/registry-lexicons': 0.7.0
       '@emdash-cms/registry-verification': 0.3.4
       '@floating-ui/react': 0.27.20(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@modelcontextprotocol/sdk': 1.32.2(zod@4.5.4)
+      '@modelcontextprotocol/sdk': 1.32.2(supports-color@10.2.2)(zod@4.5.4)
       '@oslojs/crypto': 1.0.1
       '@oslojs/encoding': 1.1.0
       '@phosphor-icons/react': 2.1.10(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -6109,28 +6123,28 @@ snapshots:
     dependencies:
       eventsource-parser: 3.1.1
 
-  express-rate-limit@8.7.3(express@5.3.0):
+  express-rate-limit@8.7.3(express@5.3.0(supports-color@10.2.2))(supports-color@10.2.2):
     dependencies:
-      debug: 4.4.3
-      express: 5.3.0
+      debug: 4.4.3(supports-color@10.2.2)
+      express: 5.3.0(supports-color@10.2.2)
       ip-address: 10.7.6
     transitivePeerDependencies:
       - supports-color
 
-  express@5.3.0:
+  express@5.3.0(supports-color@10.2.2):
     dependencies:
       accepts: 2.0.0
-      body-parser: 2.4.0
+      body-parser: 2.4.0(supports-color@10.2.2)
       content-disposition: 2.0.1
       content-type: 2.1.0
       cookie: 0.7.2
       cookie-signature: 1.2.2
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@10.2.2)
       depd: 2.0.0
       encodeurl: 2.0.1
       escape-html: 1.0.3
       etag: 1.8.1
-      finalhandler: 2.1.1
+      finalhandler: 2.1.1(supports-color@10.2.2)
       fresh: 2.0.0
       http-errors: 2.0.1
       merge-descriptors: 2.0.0
@@ -6141,9 +6155,9 @@ snapshots:
       proxy-addr: 2.0.8
       qs: 6.17.1
       range-parser: 1.3.0
-      router: 2.2.0
-      send: 1.2.1
-      serve-static: 2.2.1
+      router: 2.2.0(supports-color@10.2.2)
+      send: 1.2.1(supports-color@10.2.2)
+      serve-static: 2.2.1(supports-color@10.2.2)
       statuses: 2.0.2
       type-is: 2.1.0
       vary: 1.1.2
@@ -6178,9 +6192,9 @@ snapshots:
       web-streams-polyfill: 3.3.3
     optional: true
 
-  finalhandler@2.1.1:
+  finalhandler@2.1.1(supports-color@10.2.2):
     dependencies:
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@10.2.2)
       encodeurl: 2.0.1
       escape-html: 1.0.3
       on-finished: 2.4.2
@@ -6912,9 +6926,9 @@ snapshots:
 
   rope-sequence@1.3.4: {}
 
-  router@2.2.0:
+  router@2.2.0(supports-color@10.2.2):
     dependencies:
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@10.2.2)
       depd: 2.0.0
       is-promise: 4.0.0
       parseurl: 1.3.3
@@ -6958,9 +6972,9 @@ snapshots:
 
   semver@7.8.6: {}
 
-  send@1.2.1:
+  send@1.2.1(supports-color@10.2.2):
     dependencies:
-      debug: 4.4.3
+      debug: 4.4.3(supports-color@10.2.2)
       encodeurl: 2.0.1
       escape-html: 1.0.3
       etag: 1.8.1
@@ -6980,12 +6994,12 @@ snapshots:
 
   seroval@1.7.10: {}
 
-  serve-static@2.2.1:
+  serve-static@2.2.1(supports-color@10.2.2):
     dependencies:
       encodeurl: 2.0.1
       escape-html: 1.0.3
       parseurl: 1.3.3
-      send: 1.2.1
+      send: 1.2.1(supports-color@10.2.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -7313,13 +7327,14 @@ snapshots:
       '@volar/language-service': 2.4.31(typescript@6.0.3)
       prettier: 3.9.10
 
-  volar-service-typescript-twoslash-queries@0.0.71(@volar/language-service@2.4.31(typescript@6.0.3)):
+  volar-service-typescript-twoslash-queries@0.0.71(@volar/language-service@2.4.31(typescript@6.0.3))(typescript@6.0.3):
     dependencies:
       vscode-uri: 3.2.0
     optionalDependencies:
       '@volar/language-service': 2.4.31(typescript@6.0.3)
+      typescript: 6.0.3
 
-  volar-service-typescript@0.0.71(@volar/language-service@2.4.31(typescript@6.0.3)):
+  volar-service-typescript@0.0.71(@volar/language-service@2.4.31(typescript@6.0.3))(typescript@6.0.3):
     dependencies:
       path-browserify: 1.0.1
       semver: 7.8.6
@@ -7329,6 +7344,7 @@ snapshots:
       vscode-uri: 3.2.0
     optionalDependencies:
       '@volar/language-service': 2.4.31(typescript@6.0.3)
+      typescript: 6.0.3
 
   volar-service-yaml@0.0.71(@volar/language-service@2.4.31(typescript@6.0.3)):
     dependencies:
