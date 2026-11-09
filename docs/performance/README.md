@@ -87,10 +87,13 @@ TTL・タグを確認した。`check-cache.mjs` が自動検証する公開ペ�
 レビュー修正では、空コレクションのサイトマップが404で保存されないことと、公開記事・ページを入れたサイトマップに必要なタグが付くことも確認した。
 管理画面から実際に記事を変更する検証は行っていない。公開時のpurgeはEmDash標準実装に依存する。
 
-`pnpm typecheck` は既存の依存関係で `@astrojs/astro2tsx` のロードに失敗
+初回調査時の `pnpm typecheck` は既存の依存関係で `@astrojs/astro2tsx` のロードに失敗
 （`@emnapi/core` 1.11.3 と `@emnapi/runtime` 2.0.0-beta.2 の組み合わせで
 `this.bridge.setLastError is not a function`）。今回の変更では依存関係・lockfileは変更していない。
 型チェック成功とは扱わない。
+
+その後、mainのデプロイ自動化（#3）を取り込んだ際に、main側のWASMランタイムのoverrideと依存関係修正も統合した。
+統合後の `pnpm typecheck` は18ファイルでエラー・警告ともに0件、`pnpm test` は4件成功した。
 
 ## 構成を見直す場合
 

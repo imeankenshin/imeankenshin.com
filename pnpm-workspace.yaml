@@ -13,3 +13,7 @@ minimumReleaseAgeExclude:
   - emdash
   - "@emdash-cms/*"
 blockExoticSubdeps: true
+
+# astro2tsx の WASM ブリッジ（core 1.x）と runtime 2 beta の混在を防ぐ。
+overrides:
+  '@napi-rs/wasm-runtime@1.2.4>@emnapi/runtime': 1.11.3
