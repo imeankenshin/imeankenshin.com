@@ -77,6 +77,22 @@ DATABASE_URL="$(neon connection-string production --project-id young-scene-04976
 pnpm deploy
 ```
 
+公開HTMLは Workers Cache で配信する（5分後からバックグラウンドで再生成、
+stale 応答は最大1日）。記事・設定・メニュー・タクソノミーの変更時は EmDash が
+タグでキャッシュを削除する。プレビュー・編集URL・管理画面・エラー応答は保存しない。
+デプロイごとにキャッシュは新しくなるため、最初のアクセスは SSR になる。
+追跡パラメータ（`utm_*`、`fbclid`、`gclid`など）付きURLは、通常URLとキャッシュを共有しない。
+これらが訪問ごとに異なる場合も MISS になるため、パラメータなしURLのHIT計測値は当てはまらない。
+
+```bash
+pnpm perf                            # 公開トップを10回計測、p95 <= 500ms を判定
+pnpm perf https://imeankenshin.com/posts
+# ビルドを wrangler dev で起動した後（astro dev ではキャッシュされない）
+pnpm cache:check http://localhost:8787
+```
+
+計測結果・残る初回応答の制約・構成の選択肢は [速度調査](docs/performance/README.md) を参照。
+
 スキーマ（コレクションやフィールド）を変えるときは [Evolving a Deployed Site](https://docs.emdashcms.com/deployment/schema-evolution/) を参照。
 
 ### GitHub Actions による自動デプロイ
