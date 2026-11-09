@@ -53,8 +53,9 @@ DATABASE_URL="$(neon connection-string production --project-id young-scene-04976
 
 - サイト: https://imeankenshin.com （`wrangler.jsonc` の `routes` で Worker の独自ドメインに設定）
 - 管理画面: https://imeankenshin.com/_emdash/admin/
-- `workers_dev` とプレビュー URL は無効。別のアドレスから管理画面に入れないようにし、
-  パスキーのドメインを `imeankenshin.com` に揃えるため。
+- 本番の `workers_dev` とバージョン URL は無効。PR は独立した Worker として
+  `https://imeankenshin-com-pr-<番号>.omurakenshin.workers.dev` に公開する。
+- PR プレビューでは管理画面・認証・更新 API を遮断し、`X-Robots-Tag: noindex, nofollow` を付ける。
 
 ### 初回デプロイ（実施済み。作り直すときの手順）
 
@@ -77,6 +78,63 @@ pnpm deploy
 ```
 
 スキーマ（コレクションやフィールド）を変えるときは [Evolving a Deployed Site](https://docs.emdashcms.com/deployment/schema-evolution/) を参照。
+
+### GitHub Actions による自動デプロイ
+
+| イベント | 動作 |
+|---|---|
+| 同じリポジトリの PR 作成・更新・再オープン | 型チェック・ビルド後、`imeankenshin-com-pr-<番号>` Worker を作成・更新し、PR コメントに URL を掲載 |
+| PR クローズ（マージを含む） | 該当 PR の Worker を削除 |
+| `main` への push（PR マージを含む） | 型チェック・ビルド後、`https://imeankenshin.com` に本番デプロイ |
+| Actions の `Deploy production` → Run workflow（`main`） | 本番へ手動再デプロイ |
+
+ワークフローは `.github/workflows/preview.yml` と `deploy.yml`。
+本番・PR ごとの実行を直列化し、デプロイ途中のキャンセルや公開と削除の競合を避ける。
+fork と Dependabot の PR は Secrets を利用できないため、プレビューの対象外。
+`pull_request_target` で PR のコードを実行しない。
+
+#### 認証設定（初回のみ）
+
+GitHub リポジトリの **Settings → Secrets and variables → Actions** に以下を登録する。
+
+| 種類 | 名前 | 値 |
+|---|---|---|
+| Secret | `CLOUDFLARE_API_TOKEN` | Cloudflare のデプロイ用 API Token（登録済み） |
+| Variable | `CLOUDFLARE_ACCOUNT_ID` | `20bd7cf00ed4b81a10356ab97c27b6e0`（登録済み） |
+
+Token は対象アカウントと `imeankenshin.com` ゾーンに限定する。
+Cloudflare の **Edit Cloudflare Workers** テンプレートを基に、Workers Scripts・
+Workers Routes・KV・R2 の権限と Account Settings / Zone の読み取りを含める。
+ローカルの Wrangler OAuth Token は期限があるため、CI に転用しない。
+本番の `EMDASH_ENCRYPTION_KEY` は既存 Worker の Secret として維持され、GitHub にコピーする必要はない。
+
+ワークフローを `main` に反映した後、新しい PR または既存 PR の更新で自動実行される。
+GitHub Environments の `production` / `preview` に必須承認を設定すると、その承認までジョブは待機する。
+ただし現在は本番・プレビューでリポジトリ Secret の同じ API Token を共有している。
+同じリポジトリに PR ブランチを push できる人は、PR 内のコードや設定を変更して本番デプロイ権限も使えるため、
+信頼できる管理者に限定する。`production` の必須承認だけでは、この権限を分離できない。
+権限の分離が必要になったら、Environment ごとに Token を分け、プレビュー用の Cloudflare アカウントも分離する。
+
+Astro の Cloudflare アダプタはビルド時に環境を選択するため、プレビューは
+`CLOUDFLARE_ENV=preview pnpm build` で作成する。その後の Wrangler は生成された
+`dist/server/wrangler.json` を使う。`--env preview` をデプロイ時だけに指定しない。
+PR ごとの Worker 名は `wrangler deploy --name imeankenshin-com-pr-<番号>` で指定する。
+
+#### プレビューのデータ
+
+- Neon ブランチ `preview`（`br-lingering-wind-a1tcw2eo`）は本番から作成した独立したコピー。
+  Hyperdrive `imeankenshin-com-preview-db` はこのブランチを参照する。
+- R2 は `imeankenshin-media-preview`、KV は `imeankenshin-com-preview-session` を使う。
+- 各 PR のコードと URL は独立する。DB・R2・KV はプレビュー間で共有し、本番からは分離する。
+  プレビュー削除時もこれらの共有リソースは残す。
+- DB は作成時点のコピーで、本番の編集や新しいメディアは自動同期しない。
+  本番の R2 メディアも自動コピーしない。
+- プレビューでは本番の Cron Trigger は実行されない。
+- URL は公開される。閲覧者を限定する場合は、プレビュー Worker に
+  [Cloudflare Access](https://developers.cloudflare.com/workers/configuration/access/) を設定する。
+
+仕組みは [Wrangler environments](https://developers.cloudflare.com/workers/wrangler/environments/)
+と [GitHub Actions からのデプロイ](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/) を参照。
 
 ## 代替: Vercel
 
