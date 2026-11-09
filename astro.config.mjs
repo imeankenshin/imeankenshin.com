@@ -5,6 +5,8 @@ import { hyperdrive, r2 } from "@emdash-cms/cloudflare";
 import { defineConfig } from "astro/config";
 import emdash from "emdash/astro";
 
+const publicCache = { maxAge: 300, swr: 86_400 };
+
 // 本番: Cloudflare Workers + Hyperdrive(PostgreSQL) + R2
 // ローカル: 同じ Worker ランタイムで、Hyperdrive は wrangler.jsonc の
 // localConnectionString（docker compose の Postgres）に接続する
@@ -15,13 +17,16 @@ export default defineConfig({
 	// Refresh after 5 min; retain stale HTML for sparse visits while revalidating.
 	cache: { provider: cacheCloudflare() },
 	routeRules: {
-		"/": { maxAge: 300, swr: 86_400, tags: ["posts", "pages"] },
+		"/": { ...publicCache, tags: ["posts", "pages"] },
 		// Term names are rendered by the list/detail pages without taxonomy hints.
-		"/posts": { maxAge: 300, swr: 86_400, tags: ["posts", "emdash:taxonomy:tag"] },
-		"/posts/[slug]": { maxAge: 300, swr: 86_400, tags: ["posts", "emdash:taxonomy:tag", "emdash:taxonomy:category"] },
-		"/[slug]": { maxAge: 300, swr: 86_400, tags: ["pages"] },
-		"/category/[slug]": { maxAge: 300, swr: 86_400, tags: ["posts"] },
-		"/tag/[slug]": { maxAge: 300, swr: 86_400, tags: ["posts"] },
+		"/posts": { ...publicCache, tags: ["posts", "emdash:taxonomy:tag"] },
+		"/posts/[slug]": { ...publicCache, tags: ["posts", "emdash:taxonomy:tag", "emdash:taxonomy:category"] },
+		"/[slug]": { ...publicCache, tags: ["pages"] },
+		"/category/[slug]": { ...publicCache, tags: ["posts"] },
+		"/tag/[slug]": { ...publicCache, tags: ["posts"] },
+		// These injected endpoints also match /[slug]; give them their own dependencies.
+		"/sitemap.xml": { ...publicCache, tags: ["posts", "pages", "emdash:settings"] },
+		"/sitemap-[collection].xml": { ...publicCache, tags: ["posts", "pages", "emdash:settings"] },
 	},
 	image: {
 		layout: "constrained",
