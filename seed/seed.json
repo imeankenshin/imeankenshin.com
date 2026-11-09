@@ -146,6 +146,12 @@
 					"label": "GitHub",
 					"url": "https://github.com/imeankenshin",
 					"target": "_blank"
+				},
+				{
+					"type": "custom",
+					"label": "X",
+					"url": "https://x.com/imeankenshin",
+					"target": "_blank"
 				}
 			]
 		}
