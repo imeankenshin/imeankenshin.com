@@ -1,4 +1,5 @@
 import cloudflare from "@astrojs/cloudflare";
+import { cacheCloudflare } from "@astrojs/cloudflare/cache";
 import react from "@astrojs/react";
 import { hyperdrive, r2 } from "@emdash-cms/cloudflare";
 import { defineConfig } from "astro/config";
@@ -10,6 +11,18 @@ import emdash from "emdash/astro";
 export default defineConfig({
 	output: "server",
 	adapter: cloudflare(),
+	// Cache public HTML before the Worker runs. EmDash purges these tags on writes.
+	// Refresh after 5 min; retain stale HTML for sparse visits while revalidating.
+	cache: { provider: cacheCloudflare() },
+	routeRules: {
+		"/": { maxAge: 300, swr: 86_400, tags: ["posts", "pages"] },
+		// Term names are rendered by the list/detail pages without taxonomy hints.
+		"/posts": { maxAge: 300, swr: 86_400, tags: ["posts", "emdash:taxonomy:tag"] },
+		"/posts/[slug]": { maxAge: 300, swr: 86_400, tags: ["posts", "emdash:taxonomy:tag", "emdash:taxonomy:category"] },
+		"/[slug]": { maxAge: 300, swr: 86_400, tags: ["pages"] },
+		"/category/[slug]": { maxAge: 300, swr: 86_400, tags: ["posts"] },
+		"/tag/[slug]": { maxAge: 300, swr: 86_400, tags: ["posts"] },
+	},
 	image: {
 		layout: "constrained",
 		responsiveStyles: true,
@@ -17,6 +30,7 @@ export default defineConfig({
 	integrations: [
 		react(),
 		emdash({
+			toolbar: "client",
 			database: hyperdrive({ binding: "HYPERDRIVE" }),
 			storage: r2({ binding: "MEDIA" }),
 		}),
