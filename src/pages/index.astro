@@ -14,7 +14,11 @@ const [intro, postsResult, linksResult, settings] = await Promise.all([
 ]);
 const home = intro.entry;
 const posts = postsResult.entries;
-const links = linksResult.data?.items ?? [];
+const menuLinks = linksResult.data?.items ?? [];
+const xUrl = "https://x.com/imeankenshin";
+const links = menuLinks.some((item) => item.url.replace(/\/$/, "") === xUrl)
+	? menuLinks
+	: [...menuLinks, { label: "X", url: xUrl, target: "_blank" }];
 const { siteTitle, siteTagline } = resolveStarterSiteIdentity(settings);
 if (Astro.cache?.enabled) {
 	Astro.cache.set(intro.cacheHint);
