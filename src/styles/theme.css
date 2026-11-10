@@ -8,6 +8,8 @@
 	--font-body: "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif;
 	--font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 	--measure: 40rem;
+	--measure-wide: 90rem;
+	--font-editorial: "Noto Serif JP", "Yu Mincho", "Hiragino Mincho ProN", serif;
 
 	/* LiveSearch（emdash/ui/search）の配色をサイトのトークンに合わせる。
 	   既定は白背景で、ダークモードだと文字が読めなくなる */
@@ -78,3 +80,5 @@ blockquote { margin: 1.5rem 0; padding-left: 1rem; border-left: 3px solid var(--
 .section-head h2 { margin: 0; }
 .section-head a { font-size: 0.9rem; color: var(--muted); }
 .pager { display: flex; justify-content: space-between; margin-top: 2rem; }
+
+.wrap-wide { max-width: var(--measure-wide); }

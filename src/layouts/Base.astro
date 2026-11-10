@@ -8,6 +8,7 @@ import "../styles/theme.css";
 
 interface Props {
 	title: string;
+	wide?: boolean;
 	pageTitle?: string | null;
 	description?: string | null;
 	image?: string | null;
@@ -21,6 +22,7 @@ interface Props {
 
 const {
 	title,
+	wide = false,
 	pageTitle,
 	description,
 	image,
@@ -117,7 +119,7 @@ const pageCtx = createPublicPageContext({
 		</header>
 
 		<main class="site-main">
-			<div class="wrap">
+			<div class:list={["wrap", { "wrap-wide": wide }]}>
 				<slot />
 			</div>
 		</main>
