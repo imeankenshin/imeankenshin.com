@@ -4,6 +4,7 @@ import { EmDashHead, EmDashBodyStart, EmDashBodyEnd } from "emdash/ui";
 import { createPublicPageContext } from "emdash/page";
 import LiveSearch from "emdash/ui/search";
 import { resolveStarterSiteIdentity } from "../utils/site-identity";
+import PostHog from "../components/posthog.astro";
 import "../styles/theme.css";
 
 interface Props {
@@ -72,6 +73,7 @@ const pageCtx = createPublicPageContext({
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>{fullTitle}</title>
+		<PostHog />
 		<EmDashHead page={pageCtx} />
 	</head>
 	<body>
@@ -127,6 +129,33 @@ const pageCtx = createPublicPageContext({
 		<footer class="site-footer">
 			<div class="wrap">© {new Date().getFullYear()} {siteTitle}</div>
 		</footer>
+
+		<script is:inline>
+			// LiveSearch has no events, and it shows the same "no results" UI for empty results and for
+			// failed requests. So observe its search API responses instead: one event per successful
+			// search response (requests are debounced by LiveSearch; aborted/failed ones are skipped).
+			// The query text is not sent.
+			if (window.posthog && document.querySelector("emdash-live-search")) {
+				const originalFetch = window.fetch;
+				window.fetch = function (input, init) {
+					const promise = originalFetch.apply(this, arguments);
+					const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+					if (new URL(url, location.href).pathname === "/_emdash/api/search") {
+						promise
+							.then((response) => (response.ok ? response.clone().json() : undefined))
+							.then((body) => {
+								const data = body && (body.data || body);
+								const items = data && (data.items || data.results);
+								if (Array.isArray(items)) {
+									window.posthog.capture("site_search_completed", { result_count: items.length });
+								}
+							})
+							.catch(() => {});
+					}
+					return promise;
+				};
+			}
+		</script>
 
 		<EmDashBodyEnd page={pageCtx} />
 	</body>
