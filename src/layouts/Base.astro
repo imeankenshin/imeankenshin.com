@@ -4,6 +4,7 @@ import { EmDashHead, EmDashBodyStart, EmDashBodyEnd } from "emdash/ui";
 import { createPublicPageContext } from "emdash/page";
 import LiveSearch from "emdash/ui/search";
 import { resolveStarterSiteIdentity } from "../utils/site-identity";
+import PostHog from "../components/posthog.astro";
 import "../styles/theme.css";
 
 interface Props {
@@ -72,6 +73,7 @@ const pageCtx = createPublicPageContext({
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>{fullTitle}</title>
+		<PostHog />
 		<EmDashHead page={pageCtx} />
 	</head>
 	<body>
@@ -127,6 +129,29 @@ const pageCtx = createPublicPageContext({
 		<footer class="site-footer">
 			<div class="wrap">© {new Date().getFullYear()} {siteTitle}</div>
 		</footer>
+
+		<script is:inline>
+			// LiveSearch has no events, so watch it un-hide its results list / no-results element.
+			// Fires once per completed search request (requests are debounced by LiveSearch).
+			{
+				const liveSearch = document.querySelector("emdash-live-search");
+				if (liveSearch && window.posthog) {
+					new MutationObserver((mutations) => {
+						const shown = mutations.find(
+							(m) =>
+								!m.target.hidden &&
+								(m.target.classList.contains("emdash-live-search-results-list") ||
+									m.target.classList.contains("emdash-live-search-no-results")),
+						);
+						if (!shown) return;
+						const resultCount = shown.target.classList.contains("emdash-live-search-no-results")
+							? 0
+							: shown.target.querySelectorAll(".emdash-live-search-result").length;
+						window.posthog.capture("site_search_completed", { result_count: resultCount });
+					}).observe(liveSearch, { attributeFilter: ["hidden"], subtree: true });
+				}
+			}
+		</script>
 
 		<EmDashBodyEnd page={pageCtx} />
 	</body>
