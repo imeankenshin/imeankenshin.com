@@ -13,6 +13,9 @@ const isDevelopment = import.meta.env.DEV;
 			posthog.init(apiKey, {
 				api_host: apiHost,
 				defaults: "2026-08-30",
+				// No cookies/localStorage and no client-side IDs; requires "Cookieless server hash mode"
+				// in the PostHog project settings. Session replay and surveys are unavailable in this mode.
+				cookieless_mode: "always",
 				capture_exceptions: {
 					capture_unhandled_errors: true,
 					capture_unhandled_rejections: true,

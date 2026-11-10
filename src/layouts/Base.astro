@@ -131,25 +131,29 @@ const pageCtx = createPublicPageContext({
 		</footer>
 
 		<script is:inline>
-			// LiveSearch has no events, so watch it un-hide its results list / no-results element.
-			// Fires once per completed search request (requests are debounced by LiveSearch).
-			{
-				const liveSearch = document.querySelector("emdash-live-search");
-				if (liveSearch && window.posthog) {
-					new MutationObserver((mutations) => {
-						const shown = mutations.find(
-							(m) =>
-								!m.target.hidden &&
-								(m.target.classList.contains("emdash-live-search-results-list") ||
-									m.target.classList.contains("emdash-live-search-no-results")),
-						);
-						if (!shown) return;
-						const resultCount = shown.target.classList.contains("emdash-live-search-no-results")
-							? 0
-							: shown.target.querySelectorAll(".emdash-live-search-result").length;
-						window.posthog.capture("site_search_completed", { result_count: resultCount });
-					}).observe(liveSearch, { attributeFilter: ["hidden"], subtree: true });
-				}
+			// LiveSearch has no events, and it shows the same "no results" UI for empty results and for
+			// failed requests. So observe its search API responses instead: one event per successful
+			// search response (requests are debounced by LiveSearch; aborted/failed ones are skipped).
+			// The query text is not sent.
+			if (window.posthog && document.querySelector("emdash-live-search")) {
+				const originalFetch = window.fetch;
+				window.fetch = function (input, init) {
+					const promise = originalFetch.apply(this, arguments);
+					const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+					if (new URL(url, location.href).pathname === "/_emdash/api/search") {
+						promise
+							.then((response) => (response.ok ? response.clone().json() : undefined))
+							.then((body) => {
+								const data = body && (body.data || body);
+								const items = data && (data.items || data.results);
+								if (Array.isArray(items)) {
+									window.posthog.capture("site_search_completed", { result_count: items.length });
+								}
+							})
+							.catch(() => {});
+					}
+					return promise;
+				};
 			}
 		</script>
 
