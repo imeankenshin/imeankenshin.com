@@ -54,16 +54,16 @@ Cloudflare Workers + Hyperdrive (PostgreSQL) + R2. See README.md. Use Wrangler f
 ## This Site
 
 Kenshin's personal site + blog, built from the EmDash Starter template and customized: Japanese UI, a minimal
-single-column design (`src/styles/theme.css`), an editable home page (`home` page entry + `links` menu), and
+design on a warm off-white background (`src/styles/theme.css`), an editable home page (`home` page entry + `links` menu), and
 Cloudflare Workers deployment. Extend the existing design tokens instead of introducing a second theme.
 
 ## Pages
 
 | Page        | Path               | What it shows                                                        |
 | ----------- | ------------------ | -------------------------------------------------------------------- |
-| Home        | `/`                | Intro from the `home` page entry, `links` menu, 5 latest posts       |
-| All posts   | `/posts`           | Post list with tags (cursor pagination)                              |
-| Post detail | `/posts/[slug]`    | Post content (`pageType="article"`)                                  |
+| Home        | `/`                | Intro from the `home` page entry and the `links` menu (pill buttons) |
+| All posts   | `/posts`           | 2-column post grid via `PostCard` (cursor pagination)                |
+| Post detail | `/posts/[slug]`    | Post content, reading time, prev/next posts (`pageType="article"`)   |
 | Page        | `/[slug]`          | Static page content (e.g. `/about`); `/home` redirects to `/`        |
 | Category    | `/category/[slug]` | Posts filtered by category (hierarchical; lookup walks the tree)     |
 | Tag         | `/tag/[slug]`      | Posts filtered by tag                                                |
@@ -79,7 +79,12 @@ Site settings have `title` and `tagline`.
 
 ## Design
 
-Japanese UI (`lang="ja"`). Dates use `formatDate()` in `src/utils/date.ts` (ja-JP, Asia/Tokyo — Workers run in UTC).
+Based on the Brilliant design `imeankesnhin.com / main` (Home, Blogs, Blog Post boards).
+Japanese UI (`lang="ja"`). Dates use `formatDate()` in `src/utils/date.ts` (`2026年11月02日`, Asia/Tokyo — Workers run in UTC).
+Fonts: Inter (UI), Noto Sans JP (body), JetBrains Mono (dates/code) from Google Fonts; headings use `.display`
+(Toppan Bunkyu Midashi Gothic when installed, else a bold Japanese sans) with the yellow `.marker` highlight.
+`PostCard.astro` is the shared list item for the blog, tag and category pages. `Base.astro` has a `footer` slot for the
+link on the right of the footer (pager, "ブログ一覧へ →").
 Design tokens live in `src/styles/theme.css` (imported by `Base.astro`), with light/dark via `prefers-color-scheme`.
 Page-specific styles go in each page's `<style>` block and reference the CSS variables.
 Don't add component libraries without a reason; the site is small on purpose.

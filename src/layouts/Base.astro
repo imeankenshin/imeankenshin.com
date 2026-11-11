@@ -9,7 +9,6 @@ import "../styles/theme.css";
 
 interface Props {
 	title: string;
-	wide?: boolean;
 	pageTitle?: string | null;
 	description?: string | null;
 	image?: string | null;
@@ -23,7 +22,6 @@ interface Props {
 
 const {
 	title,
-	wide = false,
 	pageTitle,
 	description,
 	image,
@@ -41,6 +39,11 @@ if (Astro.cache?.enabled) {
 	Astro.cache.set(menuResult.cacheHint);
 }
 
+// フッターのコピーライト表記
+const AUTHOR_NAME = "Kenshin Omura";
+// ヘッダー左上のロゴ文字。ページタイトル用のサイト名（Settings の title）とは別にドメイン名を出す
+const HEADER_WORDMARK = "imeankenshin.com";
+
 const { siteTitle, siteTagline, siteLogo } = resolveStarterSiteIdentity(
 	settingsResult.data,
 );
@@ -50,7 +53,8 @@ const titleIncludesSiteName =
 	title.endsWith(` — ${siteTitle}`);
 const fullTitle = titleIncludesSiteName ? title : `${title} — ${siteTitle}`;
 const pageDescription = description ?? siteTagline;
-const menu = menuResult.data;
+// ロゴがトップへのリンクを兼ねるので、メニューのトップ（"/"）へのリンクはヘッダーに出さない
+const navItems = (menuResult.data?.items ?? []).filter((item) => item.url !== "/");
 
 const pageCtx = createPublicPageContext({
 	Astro,
@@ -73,6 +77,12 @@ const pageCtx = createPublicPageContext({
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>{fullTitle}</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400&family=Noto+Sans+JP:wght@400;500;700&display=swap"
+		/>
 		<PostHog />
 		<EmDashHead page={pageCtx} />
 	</head>
@@ -86,17 +96,17 @@ const pageCtx = createPublicPageContext({
 						siteLogo ? (
 							<img
 								src={siteLogo.url}
-								alt={siteLogo.alt || siteTitle}
+								alt={siteLogo.alt || HEADER_WORDMARK}
 								style="height:32px;width:auto;display:block;"
 							/>
 						) : (
-							siteTitle
+							HEADER_WORDMARK
 						)
 					}
 				</a>
 				<nav class="site-nav" aria-label="メイン">
 					{
-						menu?.items.map((item) => (
+						navItems.map((item) => (
 							<a
 								href={item.url}
 								target={item.target}
@@ -110,6 +120,7 @@ const pageCtx = createPublicPageContext({
 				</nav>
 				<LiveSearch
 					placeholder="検索…"
+					expandOnFocus={{ collapsed: "7.5rem", expanded: "14rem" }}
 					collections={["posts", "pages"]}
 					routeMap={{ posts: "/posts/:slug", pages: "/:slug" }}
 				>
@@ -121,13 +132,16 @@ const pageCtx = createPublicPageContext({
 		</header>
 
 		<main class="site-main">
-			<div class:list={["wrap", { "wrap-wide": wide }]}>
+			<div class="wrap">
 				<slot />
 			</div>
 		</main>
 
 		<footer class="site-footer">
-			<div class="wrap">© {new Date().getFullYear()} {siteTitle}</div>
+			<div class="wrap">
+				<span>© {new Date().getFullYear()} {AUTHOR_NAME}</span>
+				<slot name="footer" />
+			</div>
 		</footer>
 
 		<script is:inline>
