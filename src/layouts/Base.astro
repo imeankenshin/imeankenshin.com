@@ -172,5 +172,20 @@ const pageCtx = createPublicPageContext({
 		</script>
 
 		<EmDashBodyEnd page={pageCtx} />
+		{
+			/*
+			 * Vite DevTools のドック。Astro は SSR で HTML を返すため Vite の自動注入が効かない。
+			 * 開発サーバーのハブが配信する embedded.js を、Vite のモジュールグラフを通さずに読み込む。
+			 * import.meta.env.DEV はビルド時に false になり、本番 HTML には出力されない。
+			 */
+			import.meta.env.DEV && (
+				<script is:inline type="module">
+					const s = document.createElement("script");
+					s.type = "module";
+					s.src = "/__devtools/embedded.js";
+					document.body.appendChild(s);
+				</script>
+			)
+		}
 	</body>
 </html>

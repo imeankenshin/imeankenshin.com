@@ -4,6 +4,7 @@ import react from "@astrojs/react";
 import { hyperdrive, r2 } from "@emdash-cms/cloudflare";
 import { defineConfig } from "astro/config";
 import emdash from "emdash/astro";
+import { viteDevtoolsAstroBuild } from "./scripts/vite-devtools-astro-build.mjs";
 
 const publicCache = { maxAge: 300, swr: 86_400 };
 
@@ -45,5 +46,9 @@ export default defineConfig({
 		// pg は CommonJS のため、開発時の Worker ランタイムでは事前バンドルが必要
 		// （ないと "require is not defined" で 500 になる）
 		environments: { ssr: { optimizeDeps: { include: ["pg"] } } },
+		// Vite DevTools（https://devtools.vite.dev）。開発サーバーでのみ有効にし、本番ビルドには含めない
+		devtools: { apply: "serve" },
+		// DevTools の Rolldown パネルの「Run build」で vite build ではなく astro build を実行する
+		plugins: [viteDevtoolsAstroBuild()],
 	},
 });
