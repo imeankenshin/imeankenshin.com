@@ -41,6 +41,8 @@ if (Astro.cache?.enabled) {
 
 // フッターのコピーライト表記
 const AUTHOR_NAME = "Kenshin Omura";
+// ヘッダー左上のロゴ文字。ページタイトル用のサイト名（Settings の title）とは別にドメイン名を出す
+const HEADER_WORDMARK = "imeankenshin.com";
 
 const { siteTitle, siteTagline, siteLogo } = resolveStarterSiteIdentity(
 	settingsResult.data,
@@ -51,7 +53,8 @@ const titleIncludesSiteName =
 	title.endsWith(` — ${siteTitle}`);
 const fullTitle = titleIncludesSiteName ? title : `${title} — ${siteTitle}`;
 const pageDescription = description ?? siteTagline;
-const menu = menuResult.data;
+// ロゴがトップへのリンクを兼ねるので、メニューのトップ（"/"）へのリンクはヘッダーに出さない
+const navItems = (menuResult.data?.items ?? []).filter((item) => item.url !== "/");
 
 const pageCtx = createPublicPageContext({
 	Astro,
@@ -93,17 +96,17 @@ const pageCtx = createPublicPageContext({
 						siteLogo ? (
 							<img
 								src={siteLogo.url}
-								alt={siteLogo.alt || siteTitle}
+								alt={siteLogo.alt || HEADER_WORDMARK}
 								style="height:32px;width:auto;display:block;"
 							/>
 						) : (
-							siteTitle
+							HEADER_WORDMARK
 						)
 					}
 				</a>
 				<nav class="site-nav" aria-label="メイン">
 					{
-						menu?.items.map((item) => (
+						navItems.map((item) => (
 							<a
 								href={item.url}
 								target={item.target}

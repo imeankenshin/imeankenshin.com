@@ -5,8 +5,8 @@
 	--fg: #1c1b19;
 	--text: #3a3833; /* 本文 */
 	--text-soft: #4a463f; /* トップの自己紹介 */
-	--muted: #8a8478;
-	--faint: #b0aa9e;
+	--muted: #757064; /* デザインは #8a8478。本文サイズでも WCAG AA (4.5:1) を満たすよう暗くした */
+	--faint: #b0aa9e; /* 装飾専用。読ませる文字には使わない */
 	--line: #e5e0d5;
 	--line-strong: #d9d4c8;
 	--accent: var(--fg);
@@ -128,7 +128,7 @@ pre, code { font-family: var(--font-mono); }
 	align-items: center;
 	gap: 0.5rem 1.5rem;
 	padding-bottom: 4rem;
-	color: var(--faint);
+	color: var(--muted);
 	font-family: var(--font-ui);
 	font-size: 0.75rem;
 	line-height: 1.25;

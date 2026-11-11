@@ -24,24 +24,43 @@ if (!post) {
 	return Astro.rewrite("/404");
 }
 
-// 前後の記事（公開日の古い方が「前」、新しい方が「次」）
+// 前後の記事（公開日の古い方が「前」、新しい方が「次」）。
+// 公開日が同じ記事もあるので、公開日が同じものも含めて取り、並び順の中で現在の記事の次を探す。
+// EmDash は orderBy の向きに合わせて id で同順位を並べるので、desc と asc の並びは互いにちょうど逆順になる。
+// 同じ公開日の記事が多くても見落とさないよう、現在の記事とその次が見つかるまでカーソルでページを進める。
 const publishedAt = post.data.publishedAt?.toISOString();
-const [olderResult, newerResult, settings] = await Promise.all([
-	publishedAt
-		? getEmDashCollection("posts", { where: { published_at: { lt: publishedAt } }, orderBy: { published_at: "desc" }, limit: 1 })
-		: null,
-	publishedAt
-		? getEmDashCollection("posts", { where: { published_at: { gt: publishedAt } }, orderBy: { published_at: "asc" }, limit: 1 })
-		: null,
+const currentId = post.data.id;
+const neighborCacheHints: (typeof cacheHint)[] = [];
+
+async function findNeighbor(direction: "older" | "newer") {
+	if (!publishedAt) return undefined;
+	const where = { published_at: direction === "older" ? { lte: publishedAt } : { gte: publishedAt } };
+	const orderBy = { published_at: direction === "older" ? "desc" : "asc" } as const;
+	let cursor: string | undefined;
+	let foundCurrent = false;
+	do {
+		const page = await getEmDashCollection("posts", { where, orderBy, limit: 20, cursor });
+		neighborCacheHints.push(page.cacheHint);
+		for (const entry of page.entries) {
+			if (foundCurrent) return entry;
+			if (entry.data.id === currentId) foundCurrent = true;
+			// プレビュー中の未公開記事など、現在の記事が一覧にない場合は同じ公開日の範囲を抜けたところで止める
+			else if (entry.data.publishedAt?.toISOString() !== publishedAt) return entry;
+		}
+		cursor = page.nextCursor;
+	} while (cursor);
+	return undefined;
+}
+
+const [older, newer, settings] = await Promise.all([
+	findNeighbor("older"),
+	findNeighbor("newer"),
 	getSiteSettings(),
 ]);
-const older = olderResult?.entries[0];
-const newer = newerResult?.entries[0];
 
 if (Astro.cache?.enabled) {
 	Astro.cache.set(cacheHint);
-	if (olderResult) Astro.cache.set(olderResult.cacheHint);
-	if (newerResult) Astro.cache.set(newerResult.cacheHint);
+	for (const hint of neighborCacheHints) Astro.cache.set(hint);
 }
 const { siteTitle } = resolveStarterSiteIdentity(settings);
 
@@ -153,7 +172,7 @@ const categories = post.data.terms?.category ?? [];
 	.adjacent a, .none { font-size: 0.875rem; font-weight: 500; line-height: 1.5; }
 	.adjacent a { color: var(--fg); text-decoration: none; }
 	.adjacent a:hover { text-decoration: underline; text-decoration-color: var(--marker); text-decoration-thickness: 0.2em; }
-	.none { color: var(--faint); }
+	.none { color: var(--muted); }
 	@media (max-width: 40rem) {
 		.cover { margin-inline: calc(var(--gutter) * -1); }
 		.cover :global(img) { border-radius: 0; }
