@@ -16,14 +16,13 @@ const BUILD_COMMAND = {
 export function viteDevtoolsAstroBuild() {
 	let current;
 	let currentSessionId;
+	/** 起動処理中のビルド。同時に押されたときに 2 本目を起動しないため、最初の await より前に設定する */
+	let starting;
 	let runCount = 0;
 
 	const getBuildCommand = (ctx) => ({ ...BUILD_COMMAND, cwd: ctx.cwd ?? process.cwd() });
 
-	async function startBuild(ctx) {
-		if (currentSessionId && ctx.terminals.sessions.get(currentSessionId)?.status === "running") {
-			return { sessionId: currentSessionId, alreadyRunning: true };
-		}
+	async function spawnBuild(ctx) {
 		if (current) await current.terminate().catch(() => {});
 		const sessionId = `astro:rolldown:build-${++runCount}`;
 		current = await ctx.terminals.startChildProcess(getBuildCommand(ctx), {
@@ -32,7 +31,20 @@ export function viteDevtoolsAstroBuild() {
 			icon: "ph:terminal-window-duotone",
 		});
 		currentSessionId = sessionId;
-		return { sessionId, alreadyRunning: false };
+		return sessionId;
+	}
+
+	async function startBuild(ctx) {
+		if (starting) return { sessionId: await starting, alreadyRunning: true };
+		if (currentSessionId && ctx.terminals.sessions.get(currentSessionId)?.status === "running") {
+			return { sessionId: currentSessionId, alreadyRunning: true };
+		}
+		starting = spawnBuild(ctx);
+		try {
+			return { sessionId: await starting, alreadyRunning: false };
+		} finally {
+			starting = undefined;
+		}
 	}
 
 	async function waitForBuild() {
