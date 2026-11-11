@@ -1,8 +1,7 @@
 ---
-import { getEmDashCollection, getTermsForEntries } from "emdash";
-import { Image } from "emdash/ui";
+import { getEmDashCollection } from "emdash";
 import Base from "../../layouts/Base.astro";
-import { formatDate } from "../../utils/date";
+import PostCard from "../../components/PostCard.astro";
 
 const cursor = Astro.url.searchParams.get("cursor") || undefined;
 const {
@@ -15,144 +14,30 @@ const {
 	cursor,
 });
 if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
-
-// タグは一括取得（記事ごとのクエリを避ける）
-const tagsByEntry = await getTermsForEntries(
-	"posts",
-	posts.map((p) => p.data.id),
-	"tag",
-);
 ---
 
-<Base title="ブログ" wide>
-	<h1>ブログ</h1>
+<Base title="ブログ">
+	<h1 class="display page-title"><span class="marker">ブログ</span></h1>
+	<p class="lead">技術のこと、日々のこと。思いついたままに書いています。</p>
 
 	{
 		posts.length === 0 ? (
-			<p class="meta">まだ記事がありません。</p>
+			<p class="lead">まだ記事がありません。</p>
 		) : (
-			<ul class="posts-grid">
-				{posts.map((post) => {
-					const tags = tagsByEntry.get(post.data.id) ?? [];
-					return (
-						<li>
-							<article class="post-card">
-								<a class="post-thumbnail" href={`/posts/${post.id}`} tabindex="-1" aria-hidden="true">
-									{post.data.featured_image ? (
-										<div {...post.edit.featured_image}><Image image={post.data.featured_image} /></div>
-									) : (
-										<span class="thumbnail-placeholder">画像なし</span>
-									)}
-								</a>
-								<div class="post-summary">
-								{post.data.publishedAt && (
-									<time class="meta" datetime={post.data.publishedAt.toISOString()}>{formatDate(post.data.publishedAt)}</time>
-								)}
-								<h2><a class="title" href={`/posts/${post.id}`} {...post.edit.title}>{post.data.title}</a></h2>
-								{post.data.excerpt && <p {...post.edit.excerpt}>{post.data.excerpt}</p>}
-								{tags.length > 0 && (
-									<ul class="tags">
-										{tags.map((t) => (
-											<li><a href={`/tag/${t.slug}`}>{t.label}</a></li>
-										))}
-									</ul>
-								)}
-								</div>
-							</article>
-						</li>
-					);
-				})}
+			<ul class="post-grid">
+				{posts.map((post) => (
+					<li><PostCard post={post} /></li>
+				))}
 			</ul>
 		)
 	}
-	<nav class="pager" aria-label="ページ送り">
-		{cursor ? <a href="/posts">← 最初のページ</a> : <span />}
-		{nextCursor && <a href={`/posts?cursor=${encodeURIComponent(nextCursor)}`}>次のページ →</a>}
+
+	<nav slot="footer" class="pager" aria-label="ページ送り">
+		{cursor && <a class="text-link" href="/posts">← 最初のページ</a>}
+		{nextCursor && <a class="text-link" href={`/posts?cursor=${encodeURIComponent(nextCursor)}`}>もっと見る →</a>}
 	</nav>
 </Base>
 
 <style>
-	h1 {
-		font-family: var(--font-editorial);
-		font-size: clamp(2rem, 4vw, 3rem);
-		font-weight: 400;
-		margin-bottom: clamp(2.5rem, 5vw, 4.5rem);
-	}
-	.posts-grid {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 3rem 3.5rem;
-		list-style: none;
-		padding: 0;
-		margin: 0;
-	}
-	.post-card {
-		display: grid;
-		grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.35fr);
-		gap: 1.75rem;
-		align-items: start;
-	}
-	.post-thumbnail {
-		display: block;
-		aspect-ratio: 3 / 2;
-		overflow: hidden;
-		border-radius: 4px;
-		background: var(--color-bg-subtle);
-		text-decoration: none;
-	}
-	.post-thumbnail > div { height: 100%; }
-	.post-thumbnail :global(img) {
-		display: block;
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		border-radius: 0;
-	}
-	.thumbnail-placeholder {
-		display: grid;
-		place-items: center;
-		height: 100%;
-		color: var(--muted);
-		font: 0.7rem var(--font-mono);
-		letter-spacing: 0.15em;
-	}
-	.post-summary { min-width: 0; }
-	time {
-		display: block;
-		font-family: var(--font-mono);
-		letter-spacing: 0.04em;
-		margin-bottom: 0.5rem;
-	}
-	h2 {
-		font-family: var(--font-body);
-		font-size: clamp(1.125rem, 1.5vw, 1.5rem);
-		font-weight: 400;
-		line-height: 1.55;
-		margin: 0;
-		overflow-wrap: anywhere;
-	}
-	.title { text-decoration: none; }
-	.post-summary p {
-		display: -webkit-box;
-		-webkit-box-orient: vertical;
-		-webkit-line-clamp: 2;
-		overflow: hidden;
-		color: var(--muted);
-		font-size: 0.9375rem;
-		line-height: 1.8;
-		margin: 0.65rem 0 0;
-	}
-	.tags { margin-top: 0.65rem; }
-	.pager { margin-top: 3.5rem; }
-	a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
-	@media (max-width: 64rem) {
-		.posts-grid { grid-template-columns: 1fr; gap: 2.5rem; }
-		.post-card { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); }
-	}
-	@media (max-width: 30rem) {
-		.post-card { grid-template-columns: minmax(0, 1fr) minmax(0, 1.8fr); gap: 1rem; }
-		time { font-size: 0.75rem; }
-		h2 { font-size: 1.0625rem; }
-		.post-summary p { font-size: 0.875rem; }
-	}
+	.pager { display: flex; gap: 1.5rem; }
 </style>

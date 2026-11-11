@@ -1,0 +1,91 @@
+---
+// 記事一覧の 1 件（サムネイル + 日付・タイトル・抜粋）。ブログ・タグ・カテゴリの一覧で共通
+import type { ContentEntry } from "emdash";
+import { Image } from "emdash/ui";
+import { formatDate } from "../utils/date";
+
+interface Props {
+	post: ContentEntry<any>;
+}
+
+const { post } = Astro.props;
+const href = `/posts/${post.id}`;
+---
+
+<article class="post-card">
+	<a class="thumb" href={href} tabindex="-1" aria-hidden="true">
+		{post.data.featured_image ? (
+			<div {...post.edit.featured_image}><Image image={post.data.featured_image} /></div>
+		) : (
+			<span class="thumb-empty">No image</span>
+		)}
+	</a>
+	<div class="summary">
+		{post.data.publishedAt && (
+			<time class="mono-meta" datetime={post.data.publishedAt.toISOString()}>{formatDate(post.data.publishedAt)}</time>
+		)}
+		<h2><a href={href} {...post.edit.title}>{post.data.title}</a></h2>
+		{post.data.excerpt && <p {...post.edit.excerpt}>{post.data.excerpt}</p>}
+	</div>
+</article>
+
+<style>
+	.post-card {
+		display: grid;
+		grid-template-columns: 10rem minmax(0, 1fr);
+		gap: 1.5rem;
+		align-items: start;
+	}
+	.thumb {
+		display: block;
+		aspect-ratio: 8 / 5;
+		overflow: hidden;
+		border-radius: 6px;
+		background: var(--color-bg-subtle);
+		text-decoration: none;
+	}
+	.thumb > div { height: 100%; }
+	.thumb :global(img) {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 0.4s ease;
+	}
+	.post-card:hover .thumb :global(img) { transform: scale(1.03); }
+	.thumb-empty {
+		display: grid;
+		place-items: center;
+		height: 100%;
+		color: var(--faint);
+		font: 0.6875rem var(--font-mono);
+		letter-spacing: 0.1em;
+	}
+	.summary { display: flex; flex-direction: column; gap: 0.5rem; min-width: 0; }
+	h2 {
+		margin: 0;
+		font-size: 1.1875rem;
+		font-weight: 500;
+		line-height: 1.5;
+		overflow-wrap: anywhere;
+	}
+	h2 a { text-decoration: none; }
+	.post-card:hover h2 a { text-decoration: underline; text-decoration-color: var(--marker); text-decoration-thickness: 0.2em; }
+	p {
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		overflow: hidden;
+		margin: 0;
+		color: var(--muted);
+		font-size: 0.8125rem;
+		line-height: 1.7;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.thumb :global(img) { transition: none; }
+	}
+	@media (max-width: 30rem) {
+		.post-card { grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1rem; }
+		h2 { font-size: 1.0625rem; }
+	}
+</style>
