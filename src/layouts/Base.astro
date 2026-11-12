@@ -2,7 +2,6 @@
 import { getMenuWithCacheHint, getSiteSettingsWithCacheHint } from "emdash";
 import { EmDashHead, EmDashBodyStart, EmDashBodyEnd } from "emdash/ui";
 import { createPublicPageContext } from "emdash/page";
-import LiveSearch from "emdash/ui/search";
 import { resolveStarterSiteIdentity } from "../utils/site-identity";
 import PostHog from "../components/posthog.astro";
 import "../styles/theme.css";
@@ -118,16 +117,6 @@ const pageCtx = createPublicPageContext({
 						))
 					}
 				</nav>
-				<LiveSearch
-					placeholder="検索…"
-					expandOnFocus={{ collapsed: "7.5rem", expanded: "14rem" }}
-					collections={["posts", "pages"]}
-					routeMap={{ posts: "/posts/:slug", pages: "/:slug" }}
-				>
-					<!-- クラス名は LiveSearch のスクリプトが要素を探すのに使うので変えない -->
-					<div slot="loading" class="emdash-live-search-loading">検索中…</div>
-					<div slot="no-results" class="emdash-live-search-no-results">見つかりませんでした</div>
-				</LiveSearch>
 			</div>
 		</header>
 
