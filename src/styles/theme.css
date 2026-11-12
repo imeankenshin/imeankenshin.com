@@ -125,7 +125,7 @@ pre, code { font-family: var(--font-mono); }
 .site-nav { display: flex; gap: 1.75rem; font-family: var(--font-ui); font-size: 0.875rem; font-weight: 500; line-height: 1.2; }
 .site-nav a { color: var(--muted); text-decoration: none; }
 .site-nav a:hover, .site-nav a[aria-current="page"] { color: var(--fg); }
-.site-header .emdash-live-search-input { font-family: var(--font-ui); font-size: 0.8125rem; }
+.emdash-live-search-input { font-family: var(--font-ui); font-size: 0.875rem; }
 .site-main { padding-block: 4rem 5rem; }
 @media (max-width: 40rem) { .site-main { padding-block: 3rem 4rem; } }
 .site-footer .wrap {
