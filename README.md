@@ -99,12 +99,14 @@ pnpm cache:check http://localhost:8787
 
 | イベント | 動作 |
 |---|---|
-| 同じリポジトリの PR 作成・更新・再オープン | 型チェック・ビルド後、`imeankenshin-com-pr-<番号>` Worker を作成・更新し、PR コメントに URL を掲載 |
+| PR 作成・更新・再オープン（fork・Dependabot を含む） | `CI` の `check` ジョブでテスト・型チェック・ビルド。`main` へのマージに必須 |
+| 同じリポジトリの PR 作成・更新・再オープン | プレビュー用にビルドし、`imeankenshin-com-pr-<番号>` Worker を作成・更新し、PR コメントに URL を掲載 |
 | PR クローズ（マージを含む） | 該当 PR の Worker を削除 |
 | `main` への push（PR マージを含む） | 型チェック・ビルド後、`https://imeankenshin.com` に本番デプロイ |
 | Actions の `Deploy production` → Run workflow（`main`） | 本番へ手動再デプロイ |
 
-ワークフローは `.github/workflows/preview.yml` と `deploy.yml`。
+ワークフローは `.github/workflows/ci.yml`、`preview.yml`、`deploy.yml`。
+`main` はルールセットで保護し、PR 経由の変更と `check` の成功を必須にしている（直接 push・force push・削除は不可）。
 本番・PR ごとの実行を直列化し、デプロイ途中のキャンセルや公開と削除の競合を避ける。
 fork と Dependabot の PR は Secrets を利用できないため、プレビューの対象外。
 `pull_request_target` で PR のコードを実行しない。

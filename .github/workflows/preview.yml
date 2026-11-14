@@ -37,10 +37,7 @@ jobs:
           node-version: 22.23.4
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm test
-      - run: pnpm typecheck
-        env:
-          CLOUDFLARE_ENV: preview
+      # テスト・型チェックは ci.yml の check ジョブが担当する。ここではプレビュー用にビルドするだけ。
       - run: pnpm build
         env:
           CLOUDFLARE_ENV: preview
