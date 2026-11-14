@@ -40,10 +40,13 @@ the PR's Workers preview instead of building locally.
   - The preview serves public pages only. `/_emdash` (admin, private APIs) and all write methods
     return 404 (`src/utils/preview.ts`). Its DB, R2 and KV are a copy shared by all previews and
     separate from production.
-- **`main` is protected by a ruleset:** changes go through a PR, and `check` must pass before
-  merging. Don't push to `main` directly. Still, don't call work done until `gh pr checks` is
-  green, including the preview. On `main`, `deploy.yml` reruns the checks before the production
-  deploy.
+  - Fork and Dependabot PRs get no preview (no secrets); for those, `check` is the only
+    verification.
+- **`main` is protected by a ruleset:** changes go through a PR, and `check` must pass on a
+  branch that is up to date with `main`. If `main` moved, run `gh pr update-branch <number>`
+  and wait for `check` again. Don't push to `main` directly. Don't call work done until
+  `gh pr checks` is green, including the preview when the PR has one. On `main`, `deploy.yml`
+  reruns the checks before the production deploy.
 - `npx emdash types` needs a running site, so agents can't regenerate `emdash-env.d.ts`. If a
   schema change needs new types, say so instead of editing the generated file by hand.
 
