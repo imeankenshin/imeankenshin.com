@@ -14,29 +14,27 @@ interface Props {
 const { headings } = Astro.props;
 ---
 
-{show && (
-  <nav class="toc" aria-label="目次" data-toc>
-    <div class="toc-rail" aria-hidden="true">
+<nav class="toc" aria-label="目次" data-toc>
+  <div class="toc-rail" aria-hidden="true">
+    {headings.map((h) => (
+      <span class="toc-line" style={`--depth: ${Math.min(h.depth, 2)}`} />
+    ))}
+  </div>
+  <div class="toc-panel">
+    <ol>
       {headings.map((h) => (
-        <span class="toc-line" style={`--depth: ${Math.min(h.depth, 2)}`} />
+        <li>
+          <a
+            href={`#${encodeURIComponent(h.id)}`}
+            style={`--depth: ${h.depth}`}
+          >
+            {h.text}
+          </a>
+        </li>
       ))}
-    </div>
-    <div class="toc-panel">
-      <ol>
-        {headings.map((h) => (
-          <li>
-            <a
-              href={`#${encodeURIComponent(h.id)}`}
-              style={`--depth: ${h.depth}`}
-            >
-              {h.text}
-            </a>
-          </li>
-        ))}
-      </ol>
-    </div>
-  </nav>
-)}
+    </ol>
+  </div>
+</nav>
 
 <script>
   function initToc(toc: HTMLElement) {
