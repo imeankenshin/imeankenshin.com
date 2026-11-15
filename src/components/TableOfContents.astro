@@ -1,0 +1,225 @@
+---
+/**
+ * ページ右端の目次（Notion 風）。
+ * ふだんは見出しの数だけ短い線を縦に並べ、ホバー（またはキーボードでフォーカス）すると
+ * 見出しの一覧を開く。読んでいる位置の見出しは線と一覧の両方で強調する。
+ * 幅の狭い画面とタッチ端末には出さない（本文に重なり、ホバーもできないため）。
+ */
+import type { TocHeading } from "../utils/toc";
+
+interface Props {
+  headings: TocHeading[];
+}
+
+const { headings } = Astro.props;
+---
+
+{
+  headings.length > 0 && (
+    <nav class="toc" aria-label="目次" data-toc>
+      <div class="toc-rail" aria-hidden="true">
+        {headings.map((h) => (
+          <span class="toc-line" style={`--depth: ${Math.min(h.depth, 2)}`} />
+        ))}
+      </div>
+      <div class="toc-panel">
+        <ol>
+          {headings.map((h) => (
+            <li>
+              <a
+                href={`#${encodeURIComponent(h.id)}`}
+                style={`--depth: ${h.depth}`}
+              >
+                {h.text}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </nav>
+  )
+}
+
+<script>
+  function initToc(toc: HTMLElement) {
+    const links = [...toc.querySelectorAll<HTMLAnchorElement>(".toc-panel a")];
+    const lines = [...toc.querySelectorAll<HTMLElement>(".toc-line")];
+    const targets = links.map((a) =>
+      document.getElementById(decodeURIComponent(a.hash.slice(1))),
+    );
+    let active = -1;
+
+    const setActive = (index: number) => {
+      if (index === active) return;
+      links[active]?.removeAttribute("aria-current");
+      lines[active]?.classList.remove("is-active");
+      active = index;
+      links[active]?.setAttribute("aria-current", "location");
+      lines[active]?.classList.add("is-active");
+    };
+
+    // 見出しが画面の上から 1/4 を越えたら、その節を読んでいるとみなす。
+    // 最後のほうの見出しはそこまで上がらないことがあるので、ページ末尾では最後の見出しにする。
+    const update = () => {
+      const atBottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 2;
+      const threshold = window.innerHeight / 4;
+      let current = -1;
+      targets.forEach((el, i) => {
+        if (el && (atBottom || el.getBoundingClientRect().top <= threshold))
+          current = i;
+      });
+      setActive(current);
+    };
+
+    let frame = 0;
+    const schedule = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        update();
+      });
+    };
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    update();
+
+    // 開いた一覧は本文に重なるので、Esc で閉じられるようにする（WCAG 1.4.13）。
+    // ポインターが目次から出るか、フォーカスが移るまで閉じたままにする。
+    const reopen = () => toc.removeAttribute("data-dismissed");
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      if (toc.matches(":hover") || toc.contains(document.activeElement)) {
+        toc.setAttribute("data-dismissed", "");
+      }
+    });
+    toc.addEventListener("pointerleave", reopen);
+    toc.addEventListener("focusin", reopen);
+    toc.addEventListener("focusout", (event) => {
+      if (!toc.contains(event.relatedTarget as Node | null)) reopen();
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>("[data-toc]").forEach(initToc);
+</script>
+
+<style>
+  .toc {
+    display: none;
+  }
+
+  @media screen and (min-width: 64rem) and (hover: hover) {
+    .toc {
+      display: block;
+      position: fixed;
+      top: 50%;
+      right: 0;
+      z-index: 10;
+      transform: translateY(-50%);
+      /* 線の周りもホバーの当たり判定にする */
+      padding: 1rem 1.5rem 1rem 2rem;
+    }
+  }
+
+  .toc-rail {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.75rem;
+    max-height: calc(100vh - 8rem);
+    overflow: hidden;
+    transition: opacity 0.15s ease 0.1s;
+  }
+  .toc-line {
+    display: block;
+    flex: none;
+    width: calc(1rem - var(--depth) * 0.25rem);
+    height: 2px;
+    border-radius: 1px;
+    background: var(--faint);
+    transition: background-color 0.2s ease;
+  }
+  .toc-line.is-active {
+    background: var(--fg);
+  }
+
+  .toc-panel {
+    position: absolute;
+    top: 50%;
+    right: 0.75rem;
+    width: max-content;
+    min-width: 12rem;
+    max-width: 18rem;
+    max-height: calc(100vh - 6rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0.625rem;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--button-bg);
+    box-shadow:
+      0 12px 32px rgb(0 0 0 / 0.08),
+      0 2px 6px rgb(0 0 0 / 0.04);
+    /* 隠れていてもリンクはフォーカスできるよう visibility は使わない */
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(0.5rem, -50%);
+    transition:
+      opacity 0.15s ease 0.1s,
+      transform 0.15s ease 0.1s;
+  }
+  /* マウスのクリックでフォーカスが残っても開きっぱなしにならないよう、:focus-visible だけで開く */
+  .toc:not([data-dismissed]):hover .toc-panel,
+  .toc:not([data-dismissed]):has(a:focus-visible) .toc-panel {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(0, -50%);
+    transition-delay: 0s;
+  }
+  .toc:not([data-dismissed]):hover .toc-rail,
+  .toc:not([data-dismissed]):has(a:focus-visible) .toc-rail {
+    opacity: 0;
+    transition-delay: 0s;
+  }
+
+  .toc ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .toc a {
+    display: block;
+    padding: 0.3125rem 0.625rem 0.3125rem calc(0.625rem + var(--depth) * 1rem);
+    border-radius: 6px;
+    color: var(--muted);
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    text-decoration: none;
+  }
+  .toc a:hover {
+    color: var(--fg);
+    background: color-mix(in srgb, var(--fg) 6%, transparent);
+  }
+  .toc a:focus-visible {
+    outline-offset: -2px;
+  }
+  .toc a[aria-current="location"] {
+    color: var(--fg);
+    font-weight: 600;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html:has(.toc)) {
+      scroll-behavior: smooth;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .toc-rail,
+    .toc-line,
+    .toc-panel {
+      transition: none;
+    }
+  }
+</style>

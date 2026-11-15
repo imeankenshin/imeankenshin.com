@@ -123,7 +123,10 @@ Based on the Brilliant design `imeankesnhin.com / main` (Home, Blogs, Blog Post 
 Japanese UI (`lang="ja"`). Dates use `formatDate()` in `src/utils/date.ts` (`2026年11月02日`, Asia/Tokyo — Workers run in UTC).
 Fonts: Inter (UI), Noto Sans JP (body), JetBrains Mono (dates/code) from Google Fonts; headings use `.display`
 (Toppan Bunkyu Midashi Gothic when installed, else a bold Japanese sans) with the yellow `.marker` highlight.
-`PostCard.astro` is the shared list item for the blog, tag and category pages. `Base.astro` has a `footer` slot for the
+`PostCard.astro` is the shared list item for the blog, tag and category pages.
+Post and page detail pages show a Notion-style table of contents on the right (`TableOfContents.astro`, wide screens with
+hover only): `getTocHeadings()` in `src/utils/toc.ts` collects h2–h4, and `AnchoredBlock.astro` adds the matching `id`s
+to the headings rendered by `PortableText`. `Base.astro` has a `footer` slot for the
 link on the right of the footer (pager, "ブログ一覧へ →").
 Design tokens live in `src/styles/theme.css` (imported by `Base.astro`), with light/dark via `prefers-color-scheme`.
 Page-specific styles go in each page's `<style>` block and reference the CSS variables.
