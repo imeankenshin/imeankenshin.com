@@ -5,8 +5,12 @@
  * Block は node / index / isInline 以外の props を要素の属性にそのまま渡す。
  */
 import type { ComponentProps } from "astro/types";
-import { Block } from "emdash/ui";
+import { emdashComponents } from "emdash/ui";
 import { getHeadingAnchor } from "../utils/toc";
+
+// emdash/ui は astro-portabletext の `type Block` と Block コンポーネントを同じ名前で再エクスポートしていて、
+// TypeScript は `Block` を型として解決してしまう（ts(1362)）。同じコンポーネントを emdashComponents から取る。
+const Block = emdashComponents.block;
 
 type Props = ComponentProps<typeof Block>;
 
