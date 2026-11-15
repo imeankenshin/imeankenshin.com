@@ -2,6 +2,8 @@ This is an EmDash site -- a CMS built on Astro with a full admin UI.
 
 ## Commands
 
+For humans on a workstation. Agents: don't run these; see "Verification for agents" below.
+
 ```bash
 pnpm dev              # Start local Postgres (docker compose) + the Astro dev server
 pnpm deploy           # astro build && wrangler deploy (cf cannot build Astro 7 yet)
@@ -9,6 +11,44 @@ npx emdash types      # Regenerate TypeScript types from a running site
 ```
 
 The admin UI is at `http://localhost:4321/_emdash/admin`.
+
+## Verification for agents
+
+Agents run several at a time on a small home server with no Docker and no Cloudflare login.
+Builds there get OOM-killed (exit 137) and slow every other thread, so verify through CI and
+the PR's Workers preview instead of building locally.
+
+- **Don't run** `pnpm dev`, `pnpm build`, `pnpm preview`, `pnpm deploy`, `pnpm typecheck`,
+  `astro dev`/`build`/`check`, or `wrangler dev`/`deploy`. `astro check` loads the Cloudflare
+  adapter and Vite, so it costs as much as a build.
+- **Fine to run locally:** `pnpm install --frozen-lockfile` (first, before any other command),
+  `pnpm test` (`node --test`, light), and reading or grepping code. Use `pnpm exec wrangler`,
+  never `npx wrangler` (it downloads a different version than the lockfile).
+- **If a command is killed** (`Killed`, exit 137, SIGKILL), don't retry it or switch to another
+  heavy command. Stop and report it.
+- **Temp files:** create them with `mktemp -d`. Never write fixed names like `/tmp/build.log`;
+  other agents share `/tmp`.
+- **To verify a change,** push the branch and open a PR (only when the task includes a PR;
+  otherwise say build verification is pending). Two workflows run on the PR:
+  - `CI` (`.github/workflows/ci.yml`), job `check`: `pnpm test`, `pnpm typecheck`, `pnpm build`.
+  - `PR preview` (`.github/workflows/preview.yml`): builds with `CLOUDFLARE_ENV=preview` and
+    deploys the PR to its own Worker, `imeankenshin-com-pr-<number>`.
+  - Wait for the checks: `gh pr checks <number>`. On failure, read the log:
+    `gh run view <run-id> --log-failed`, fix it, and push again.
+  - The preview URL is in the PR comment that starts with `Cloudflareプレビュー:`
+    (`gh pr view <number> --comments`). Check the changed pages there, e.g. with `curl`.
+  - The preview serves public pages only. `/_emdash` (admin, private APIs) and all write methods
+    return 404 (`src/utils/preview.ts`). Its DB, R2 and KV are a copy shared by all previews and
+    separate from production.
+  - Fork and Dependabot PRs get no preview (no secrets); for those, `check` is the only
+    verification.
+- **`main` is protected by a ruleset:** changes go through a PR, and `check` must pass on a
+  branch that is up to date with `main`. If `main` moved, run `gh pr update-branch <number>`
+  and wait for `check` again. Don't push to `main` directly. Don't call work done until
+  `gh pr checks` is green, including the preview when the PR has one. On `main`, `deploy.yml`
+  reruns the checks before the production deploy.
+- `npx emdash types` needs a running site, so agents can't regenerate `emdash-env.d.ts`. If a
+  schema change needs new types, say so instead of editing the generated file by hand.
 
 ## Key Files
 
