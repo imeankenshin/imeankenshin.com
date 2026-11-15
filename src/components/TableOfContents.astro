@@ -14,27 +14,31 @@ interface Props {
 const { headings } = Astro.props;
 ---
 
-<nav class="toc" aria-label="目次" data-toc>
-  <div class="toc-rail" aria-hidden="true">
-    {headings.map((h) => (
-      <span class="toc-line" style={`--depth: ${Math.min(h.depth, 2)}`} />
-    ))}
-  </div>
-  <div class="toc-panel">
-    <ol>
-      {headings.map((h) => (
-        <li>
-          <a
-            href={`#${encodeURIComponent(h.id)}`}
-            style={`--depth: ${h.depth}`}
-          >
-            {h.text}
-          </a>
-        </li>
-      ))}
-    </ol>
-  </div>
-</nav>
+{
+  headings.length > 0 && (
+    <nav class="toc" aria-label="目次" data-toc>
+      <div class="toc-rail" aria-hidden="true">
+        {headings.map((h) => (
+          <span class="toc-line" style={`--depth: ${Math.min(h.depth, 2)}`} />
+        ))}
+      </div>
+      <div class="toc-panel">
+        <ol>
+          {headings.map((h) => (
+            <li>
+              <a
+                href={`#${encodeURIComponent(h.id)}`}
+                style={`--depth: ${h.depth}`}
+              >
+                {h.text}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </nav>
+  )
+}
 
 <script>
   function initToc(toc: HTMLElement) {
@@ -80,6 +84,21 @@ const { headings } = Astro.props;
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
     update();
+
+    // 開いた一覧は本文に重なるので、Esc で閉じられるようにする（WCAG 1.4.13）。
+    // ポインターが目次から出るか、フォーカスが移るまで閉じたままにする。
+    const reopen = () => toc.removeAttribute("data-dismissed");
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      if (toc.matches(":hover") || toc.contains(document.activeElement)) {
+        toc.setAttribute("data-dismissed", "");
+      }
+    });
+    toc.addEventListener("pointerleave", reopen);
+    toc.addEventListener("focusin", reopen);
+    toc.addEventListener("focusout", (event) => {
+      if (!toc.contains(event.relatedTarget as Node | null)) reopen();
+    });
   }
 
   document.querySelectorAll<HTMLElement>("[data-toc]").forEach(initToc);
@@ -151,15 +170,15 @@ const { headings } = Astro.props;
       transform 0.15s ease 0.1s;
   }
   /* マウスのクリックでフォーカスが残っても開きっぱなしにならないよう、:focus-visible だけで開く */
-  .toc:hover .toc-panel,
-  .toc:has(a:focus-visible) .toc-panel {
+  .toc:not([data-dismissed]):hover .toc-panel,
+  .toc:not([data-dismissed]):has(a:focus-visible) .toc-panel {
     opacity: 1;
     pointer-events: auto;
     transform: translate(0, -50%);
     transition-delay: 0s;
   }
-  .toc:hover .toc-rail,
-  .toc:has(a:focus-visible) .toc-rail {
+  .toc:not([data-dismissed]):hover .toc-rail,
+  .toc:not([data-dismissed]):has(a:focus-visible) .toc-rail {
     opacity: 0;
     transition-delay: 0s;
   }
