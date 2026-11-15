@@ -2,7 +2,10 @@
 import { getEmDashEntry, getSeoMeta, decodeSlug, getSiteSettings } from "emdash";
 import { PortableText } from "emdash/ui";
 import Base from "../layouts/Base.astro";
+import AnchoredBlock from "../components/AnchoredBlock.astro";
+import TableOfContents from "../components/TableOfContents.astro";
 import { resolveStarterSiteIdentity } from "../utils/site-identity";
+import { getTocHeadings, provideHeadingAnchors } from "../utils/toc";
 
 const slug = decodeSlug(Astro.params.slug);
 
@@ -34,6 +37,10 @@ const seo = getSeoMeta(page, {
 	siteUrl: Astro.url.origin,
 	path: Astro.url.pathname.replace(/\/$/, ""),
 });
+
+// 目次。本文の見出しにも同じ id を付ける（AnchoredBlock）
+const headings = getTocHeadings(page.data.content);
+provideHeadingAnchors(Astro.request, headings);
 ---
 
 <Base
@@ -46,9 +53,10 @@ const seo = getSeoMeta(page, {
 	<article>
 		<h1 class="display title"><span class="marker" {...page.edit.title}>{page.data.title}</span></h1>
 		<div class="prose" {...page.edit.content}>
-			<PortableText value={page.data.content} />
+			<PortableText value={page.data.content} components={{ block: AnchoredBlock }} />
 		</div>
 	</article>
+	<TableOfContents headings={headings} />
 </Base>
 
 <style>

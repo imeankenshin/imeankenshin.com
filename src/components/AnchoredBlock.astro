@@ -1,0 +1,17 @@
+---
+/**
+ * emdash の Block（段落・見出し）に、目次から飛べるよう見出しの id を足す。
+ * id はページが provideHeadingAnchors() で登録したもの（src/utils/toc.ts）。
+ * Block は node / index / isInline 以外の props を要素の属性にそのまま渡す。
+ */
+import type { ComponentProps } from "astro/types";
+import { Block } from "emdash/ui";
+import { getHeadingAnchor } from "../utils/toc";
+
+type Props = ComponentProps<typeof Block>;
+
+const id = getHeadingAnchor(Astro.request, Astro.props.node._key);
+const blockProps = (id ? { ...Astro.props, id } : Astro.props) as Props;
+---
+
+<Block {...blockProps}><slot /></Block>

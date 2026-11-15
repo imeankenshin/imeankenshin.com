@@ -176,6 +176,7 @@ pre, code { font-family: var(--font-mono); }
 .prose > :last-child { margin-bottom: 0; }
 .prose :where(p, ul, ol) { margin: 1.5rem 0; }
 .prose :where(h2, h3) { color: var(--fg); font-weight: 700; line-height: 1.5; margin: 2.5rem 0 1.5rem; }
+.prose :where(h2, h3, h4)[id] { scroll-margin-top: 2rem; } /* 目次から飛んだとき、見出しを画面の端に貼り付けない */
 .prose :where(h2) { font-size: 1.5rem; }
 .prose :where(h3) { font-size: 1.25rem; }
 .prose :where(a) { text-decoration-color: var(--marker); text-decoration-thickness: 0.15em; }

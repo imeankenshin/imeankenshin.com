@@ -9,8 +9,11 @@ import {
 } from "emdash";
 import { Image, PortableText } from "emdash/ui";
 import Base from "../../layouts/Base.astro";
+import AnchoredBlock from "../../components/AnchoredBlock.astro";
+import TableOfContents from "../../components/TableOfContents.astro";
 import { resolveStarterSiteIdentity } from "../../utils/site-identity";
 import { formatDate } from "../../utils/date";
+import { getTocHeadings, provideHeadingAnchors } from "../../utils/toc";
 
 const slug = decodeSlug(Astro.params.slug);
 
@@ -77,6 +80,10 @@ const readingMinutes = Math.max(1, Math.round(extractPlainText(post.data.content
 // Taxonomy terms are already hydrated onto the entry by getEmDashEntry.
 const tags = post.data.terms?.tag ?? [];
 const categories = post.data.terms?.category ?? [];
+
+// 目次。本文の見出しにも同じ id を付ける（AnchoredBlock）
+const headings = getTocHeadings(post.data.content);
+provideHeadingAnchors(Astro.request, headings);
 ---
 
 <Base
@@ -126,9 +133,11 @@ const categories = post.data.terms?.category ?? [];
 		}
 
 		<div class="prose" {...post.edit.content}>
-			<PortableText value={post.data.content} />
+			<PortableText value={post.data.content} components={{ block: AnchoredBlock }} />
 		</div>
 	</article>
+
+	<TableOfContents headings={headings} />
 
 	<nav class="adjacent" aria-label="前後の記事">
 		<div>
