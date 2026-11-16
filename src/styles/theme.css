@@ -141,6 +141,32 @@ pre, code { font-family: var(--font-mono); }
 	line-height: 1.25;
 }
 
+.footer-meta { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; }
+.footer-meta a { color: inherit; text-decoration: none; }
+.footer-meta a:hover { color: var(--fg); }
+
+/* Cookie の同意ボタン（CookieConsent.astro のバナーと /privacy で共通）。
+   「同意する」と「拒否する」は同じ見た目にして、どちらかに誘導しない */
+.consent-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.consent-button {
+	padding: 0.5rem 1.125rem;
+	border: 1.5px solid var(--fg);
+	border-radius: 999px;
+	background: var(--button-bg);
+	box-shadow: 2px 2px 0 var(--fg);
+	color: var(--fg);
+	cursor: pointer;
+	font-family: var(--font-ui);
+	font-size: 0.8125rem;
+	font-weight: 600;
+	line-height: 1.2;
+}
+.consent-button:hover { box-shadow: 3px 3px 0 var(--fg); transform: translate(-1px, -1px); }
+.consent-button:active { box-shadow: 1px 1px 0 var(--fg); transform: translate(1px, 1px); }
+.consent-button:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; }
+/* /privacy の設定欄で、いまの選択を塗りつぶしで示す */
+.consent-button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+
 /* 「もっと見る →」「ブログ一覧へ →」などの小さなテキストリンク */
 .text-link { color: var(--muted); font-family: var(--font-body); font-size: 0.8125rem; font-weight: 500; text-decoration: none; }
 .text-link:hover { color: var(--fg); }

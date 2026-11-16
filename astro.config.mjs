@@ -25,6 +25,8 @@ export default defineConfig({
 		"/[slug]": { ...publicCache, tags: ["pages"] },
 		"/category/[slug]": { ...publicCache, tags: ["posts"] },
 		"/tag/[slug]": { ...publicCache, tags: ["posts"] },
+		// Static text in code; the layout adds its own settings/menu hints. The consent UI is client-side.
+		"/privacy": publicCache,
 		// These injected endpoints also match /[slug]; give them their own dependencies.
 		"/sitemap.xml": { ...publicCache, tags: ["posts", "pages", "emdash:settings"] },
 		"/sitemap-[collection].xml": { ...publicCache, tags: ["posts", "pages", "emdash:settings"] },
