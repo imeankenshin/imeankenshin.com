@@ -82,14 +82,38 @@ const { headings } = Astro.props;
     // ページ末尾の短い節は見出しが判定の位置まで上がらず、押した項目と違う項目が光ってしまうため。
     let pinned = -1;
     let settleTimer = 0;
+    // スクロールが止まったときに見出しの位置にいなければ、途中で利用者が動かしたとみなす。
+    // スクロールバーのドラッグなど、入力イベントでは拾えない操作もこれで解除できる
+    const reachedPinned = () => {
+      const target = targets[pinned];
+      if (!target) return false;
+      const margin = parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
+      const maxY =
+        document.documentElement.scrollHeight - window.innerHeight;
+      const expected = Math.min(
+        Math.max(window.scrollY + target.getBoundingClientRect().top - margin, 0),
+        maxY,
+      );
+      return Math.abs(window.scrollY - expected) <= 2;
+    };
     const settle = () => {
       clearTimeout(settleTimer);
-      settleTimer = window.setTimeout(() => (settleTimer = 0), 200);
+      settleTimer = window.setTimeout(() => {
+        settleTimer = 0;
+        if (pinned >= 0 && !reachedPinned()) unpin();
+      }, 200);
     };
     const pin = (index: number) => {
       pinned = index;
       setActive(index);
       settle();
+    };
+    const unpin = () => {
+      if (pinned < 0) return;
+      pinned = -1;
+      clearTimeout(settleTimer);
+      settleTimer = 0;
+      schedule();
     };
 
     // 見出しが画面の上から 1/4 を越えたら、その節を読んでいるとみなす。
@@ -122,25 +146,64 @@ const { headings } = Astro.props;
     window.addEventListener(
       "scroll",
       () => {
-        // 目次から飛んでいる途中のスクロールでは強調を動かさない。止まったあとのスクロールで解除する
+        // 目次から飛んでいる途中のスクロールでは強調を動かさない。
+        // 止まったあとのスクロール（スクロールバーの操作など）で解除する
         if (pinned >= 0) {
           if (settleTimer) {
             settle();
             return;
           }
-          pinned = -1;
+          unpin();
+          return;
         }
         schedule();
       },
       { passive: true },
     );
-    window.addEventListener("resize", schedule);
+    window.addEventListener("resize", () => {
+      schedule();
+      // 一覧の高さが変わったり、幅が広がって目次が現れたりすると、強調した項目がはみ出すことがある。
+      // 強調する項目は変わらないこともあるので、update() のあとでここでも見える位置へ動かす
+      requestAnimationFrame(() => {
+        if (links[active]) revealInPanel(links[active]);
+      });
+    });
 
-    // URL の # から開いたときや、本文中のリンクで見出しへ移ったときも、その見出しを強調する
+    // 飛んでいる途中でも、利用者が自分でスクロールし始めたらすぐに解除する。
+    // 目次の上のホイールは一覧のスクロールに使われることがあるので数えない（ページが動けば上の判定で解除される）
+    const scrollKeys = new Set([
+      "ArrowUp",
+      "ArrowDown",
+      "PageUp",
+      "PageDown",
+      "Home",
+      "End",
+      " ",
+    ]);
+    window.addEventListener(
+      "wheel",
+      (event) => {
+        if (!toc.contains(event.target as Node)) unpin();
+      },
+      { passive: true },
+    );
+    window.addEventListener("touchmove", unpin, { passive: true });
+    // ページのスクロールバーを押したとき（イベントを出さないブラウザでは、止まったときの位置で判定する）
+    window.addEventListener("pointerdown", (event) => {
+      const root = document.documentElement;
+      if (event.target === root && event.clientX >= root.clientWidth) unpin();
+    });
+    window.addEventListener("keydown", (event) => {
+      if (scrollKeys.has(event.key)) unpin();
+    });
+
+    // URL の # から開いたときや、本文中のリンクで見出しへ移ったときも、その見出しを強調する。
+    // 目次にない # や # なしの履歴に戻ったときは、スクロール位置から決め直す
     const pinFromHash = () => {
       const id = idOf(location.hash);
       const index = id ? targets.findIndex((el) => el?.id === id) : -1;
       if (index >= 0) pin(index);
+      else unpin();
     };
     window.addEventListener("hashchange", pinFromHash);
     pinFromHash();
