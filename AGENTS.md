@@ -108,6 +108,7 @@ Cloudflare Workers deployment. Extend the existing design tokens instead of intr
 | Page        | `/[slug]`          | Static page content (e.g. `/about`); `/home` redirects to `/`        |
 | Category    | `/category/[slug]` | Posts filtered by category (hierarchical; lookup walks the tree)     |
 | Tag         | `/tag/[slug]`      | Posts filtered by tag                                                |
+| Privacy     | `/privacy`         | Privacy policy + cookie settings (static text in code, not the CMS)  |
 
 ## Schema
 
@@ -129,6 +130,13 @@ Post and page detail pages show a Notion-style table of contents on the right (`
 hover only): `getTocHeadings()` in `src/utils/toc.ts` collects h2–h4, and `AnchoredBlock.astro` adds the matching `id`s
 to the headings rendered by `PortableText`. `Base.astro` has a `footer` slot for the
 link on the right of the footer (pager, "ブログ一覧へ →").
+Analytics: PostHog (`src/components/posthog.astro`, only when `PUBLIC_POSTHOG_*` are set at build time) with
+`cookieless_mode: "on_reject"`. Visitors are counted cookielessly until they accept the cookie banner
+(`CookieConsent.astro`); accepting enables cookies and session replay. `src/scripts/consent.ts` drives the banner and the
+settings on `/privacy`. Error tracking: browser exceptions via `capture_exceptions`; SSR exceptions via `src/middleware.ts` →
+`src/utils/server-errors.ts` (`posthog-node`, edge build). `deploy.yml` uploads client source maps when the
+`POSTHOG_CLI_API_KEY` secret is set (`CLIENT_SOURCEMAPS=true` builds them; they are deleted before deploy).
+When you change what PostHog collects, update the text of `src/pages/privacy.astro` too.
 Design tokens live in `src/styles/theme.css` (imported by `Base.astro`), with light/dark via `prefers-color-scheme`.
 Page-specific styles go in each page's `<style>` block and reference the CSS variables.
 Don't add component libraries without a reason; the site is small on purpose.

@@ -4,6 +4,8 @@ import { EmDashHead, EmDashBodyStart, EmDashBodyEnd } from "emdash/ui";
 import { createPublicPageContext } from "emdash/page";
 import { resolveStarterSiteIdentity } from "../utils/site-identity";
 import PostHog from "../components/posthog.astro";
+import CookieConsent from "../components/CookieConsent.astro";
+import { posthogConfig } from "../utils/analytics";
 import "../styles/theme.css";
 
 interface Props {
@@ -128,7 +130,12 @@ const pageCtx = createPublicPageContext({
 
 		<footer class="site-footer">
 			<div class="wrap">
-				<span>© {new Date().getFullYear()} {AUTHOR_NAME}</span>
+				<span class="footer-meta">
+					<span>© {new Date().getFullYear()} {AUTHOR_NAME}</span>
+					<a href="/privacy" aria-current={Astro.url.pathname === "/privacy" ? "page" : undefined}>
+						プライバシーポリシー
+					</a>
+				</span>
 				<slot name="footer" />
 			</div>
 		</footer>
@@ -159,6 +166,8 @@ const pageCtx = createPublicPageContext({
 				};
 			}
 		</script>
+
+		{posthogConfig && <CookieConsent />}
 
 		<EmDashBodyEnd page={pageCtx} />
 		{
