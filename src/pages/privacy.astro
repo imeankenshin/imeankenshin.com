@@ -32,9 +32,12 @@ const posthogRegion = posthogConfig ? getPostHogRegion(posthogConfig.apiHost) : 
 				<li>クリックした位置・要素とその文字、スクロールした深さ（ヒートマップ）</li>
 				<li>ブラウザ・OS・端末の種類、画面の大きさ、言語の設定</li>
 				<li>IP アドレス（おおよその地域の推定と、下の「Cookie を使わない計測」の識別に使います）</li>
-				<li>ページで起きた JavaScript のエラー</li>
+				<li>ページで起きた JavaScript のエラー（エラーの内容と、起きた場所）</li>
 				<li>サイト内検索の結果の件数（検索した語句は送信しません）</li>
 			</ul>
+			<p>
+				サーバーでページを作るときにエラーが起きた場合も、エラーの内容とページの URL を PostHog に送ります。これには閲覧者を識別する情報は含みません。
+			</p>
 			<p>
 				送信された情報は PostHog のサーバー{posthogRegion && `（${posthogRegion}）`}に保存され、PostHog
 				の利用プランで決まった保存期間を過ぎると削除されます。PostHog での情報の扱いは、<a href="https://posthog.com/privacy" rel="noopener noreferrer"
