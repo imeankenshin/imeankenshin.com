@@ -12,6 +12,10 @@ const publicCache = { maxAge: 300, swr: 86_400 };
 // ローカル: 同じ Worker ランタイムで、Hyperdrive は wrangler.jsonc の
 // localConnectionString（docker compose の Postgres）に接続する
 export default defineConfig({
+	i18n: {
+		locales: ["ja"],
+		defaultLocale: "ja"
+	},
 	output: "server",
 	adapter: cloudflare(),
 	// Cache public HTML before the Worker runs. EmDash purges these tags on writes.
