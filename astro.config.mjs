@@ -13,6 +13,7 @@ const publicCache = { maxAge: 300, swr: 86_400 };
 // localConnectionString（docker compose の Postgres）に接続する
 export default defineConfig({
 	i18n: {
+		locales: ["ja"],
 		defaultLocale: "ja"
 	},
 	output: "server",
