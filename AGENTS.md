@@ -125,6 +125,8 @@ Based on the Brilliant design `imeankesnhin.com / main` (Home, Blogs, Blog Post 
 Japanese UI (`lang="ja"`). Dates use `formatDate()` in `src/utils/date.ts` (`2026年11月02日`, Asia/Tokyo — Workers run in UTC).
 Fonts: Inter (UI), Noto Sans JP (body), JetBrains Mono (dates/code) from Google Fonts; headings use `.display`
 (Toppan Bunkyu Midashi Gothic when installed, else a bold Japanese sans) with the yellow `.marker` highlight.
+Favicon: the logo in `public/favicon.svg`, linked from `Base.astro`. If a favicon is set in the admin Site Settings,
+`EmDashHead` outputs that one and the default link is left out.
 `PostCard.astro` is the shared list item for the blog, tag and category pages.
 Post and page detail pages show a Notion-style table of contents on the right (`TableOfContents.astro`, wide screens with
 hover only): `getTocHeadings()` in `src/utils/toc.ts` collects h2–h4, and `AnchoredBlock.astro` adds the matching `id`s
