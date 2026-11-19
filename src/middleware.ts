@@ -1,5 +1,6 @@
 import { defineMiddleware } from "astro:middleware";
 import { captureServerException } from "./utils/server-errors";
+import { allowPublicMediaInRobots } from "./utils/robots";
 import { canonicalizeHomeInSitemap } from "./utils/sitemap";
 
 // Route rules also match failed renders. Run after the page and layout have
@@ -21,6 +22,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
 	// page TTL or page invalidation tags to the injected endpoint.
 	if (context.url.pathname === "/_image") context.cache?.set(false);
 	const isPreview = context.url.searchParams.has("_preview") || context.url.searchParams.has("_edit");
+	// EmDash's robots.txt blocks /_emdash/, which hides og:image (a media file) from X's crawler.
+	if (response.ok && response.body && context.url.pathname === "/robots.txt") {
+		const robots = await response.text();
+		response = new Response(allowPublicMediaInRobots(robots), response);
+		response.headers.delete("Content-Length");
+		response.headers.delete("ETag");
+	}
 	// robots.txt can return a permissive fallback with status 200 on DB failure.
 	if (response.status >= 400 || isPreview || context.url.pathname === "/robots.txt") {
 		context.cache?.set(false);
