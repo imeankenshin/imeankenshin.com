@@ -17,19 +17,19 @@ const withAllow = (robots) =>
 
 test("allows the public media path in EmDash's default robots.txt", () => {
 	const robots = [...HEAD, SITEMAP, ""].join("\n");
-	assert.equal(allowPublicMediaInRobots(robots), withAllow(robots));
+	assert.equal(allowPublicMediaInRobots(robots, false), withAllow(robots));
 });
 
 test("allows the public media path when AI training is disallowed", () => {
 	const robots = [...HEAD, AI_TRAINING_RULES, "", SITEMAP, ""].join("\n");
-	const result = allowPublicMediaInRobots(robots);
+	const result = allowPublicMediaInRobots(robots, false);
 	assert.equal(result, withAllow(robots));
 	assert.match(result, /User-agent: GPTBot\nDisallow: \/\n/);
 });
 
 test("does not add the rule twice", () => {
 	const robots = withAllow([...HEAD, SITEMAP, ""].join("\n"));
-	assert.equal(allowPublicMediaInRobots(robots), robots);
+	assert.equal(allowPublicMediaInRobots(robots, false), robots);
 });
 
 test("leaves custom robots.txt unchanged, so admin rules are never overridden", () => {
@@ -40,6 +40,15 @@ test("leaves custom robots.txt unchanged, so admin rules are never overridden", 
 		"User-agent: *\r\nAllow: /\r\nDisallow: /_emdash/ # admin\r\n",
 		"User-agent: *\nDisallow : /_EMDASH/\n",
 		"User-agent: *\nAllow: /\n",
+		// CR-only line breaks hide more rules on the "Sitemap" line.
+		[...HEAD, `${SITEMAP}\rUser-agent: *\rDisallow: /`, ""].join("\n"),
+		[...HEAD, AI_TRAINING_RULES.replace("GPTBot", "GPTBot\rUser-agent: *"), "", SITEMAP, ""].join("\n"),
 	];
-	for (const robots of customs) assert.equal(allowPublicMediaInRobots(robots), robots);
+	for (const robots of customs) assert.equal(allowPublicMediaInRobots(robots, false), robots);
+});
+
+test("leaves a custom robots.txt that is a byte-for-byte copy of the default unchanged", () => {
+	for (const robots of [[...HEAD, SITEMAP, ""].join("\n"), [...HEAD, AI_TRAINING_RULES, "", SITEMAP, ""].join("\n")]) {
+		assert.equal(allowPublicMediaInRobots(robots, true), robots);
+	}
 });
