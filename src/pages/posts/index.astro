@@ -55,4 +55,5 @@ if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
 	.pager { display: flex; gap: 1.5rem; }
 	.post-search { max-width: 24rem; margin-top: 2rem; }
 	.post-search :global(.emdash-live-search-input) { width: 100%; box-sizing: border-box; }
+	.post-search :global(.emdash-live-search-input::placeholder) { color: var(--muted); opacity: 1; }
 </style>
