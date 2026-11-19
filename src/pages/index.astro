@@ -39,7 +39,7 @@ function iconFor(url: string) {
 }
 ---
 
-<Base title={siteTitle} description={siteTagline} content={home ? { collection: "pages", id: home.data.id, slug: "home" } : undefined}>
+<Base title={siteTitle} description={siteTagline} canonical={new URL("/", Astro.url).href} content={home ? { collection: "pages", id: home.data.id, slug: "home" } : undefined}>
 	<section class="intro">
 		<h1 class="display headline" {...home?.edit.title}>
 			<span class="marker">{home ? home.data.title : siteTitle}</span>

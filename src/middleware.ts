@@ -1,5 +1,6 @@
 import { defineMiddleware } from "astro:middleware";
 import { captureServerException } from "./utils/server-errors";
+import { canonicalizeHomeInSitemap } from "./utils/sitemap";
 
 // Route rules also match failed renders. Run after the page and layout have
 // contributed hints so a later layout cannot accidentally re-enable caching.
@@ -27,6 +28,17 @@ export const onRequest = defineMiddleware(async (context, next) => {
 		const uncached = new Response(response.body, response);
 		uncached.headers.set("Cache-Control", isPreview ? "private, no-store" : "no-store");
 		return uncached;
+	}
+	// EmDash's generated sitemap uses the CMS slug, which redirects on this site.
+	if (response.ok && response.body && /^\/sitemap-pages(?:-\d+)?\.xml$/.test(context.url.pathname)) {
+		const xml = await response.text();
+		const canonicalXml = canonicalizeHomeInSitemap(xml);
+		const sitemap = new Response(canonicalXml, response);
+		if (canonicalXml !== xml) {
+			sitemap.headers.delete("Content-Length");
+			sitemap.headers.delete("ETag");
+		}
+		return sitemap;
 	}
 	return response;
 });
