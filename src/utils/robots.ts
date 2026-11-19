@@ -1,4 +1,4 @@
-import type { SiteSettings } from "emdash";
+import type { SeoSettings, SiteSettings } from "emdash";
 
 /** EmDash's public media endpoint. OG images and post images are served from here. */
 export const PUBLIC_MEDIA_PATH = "/_emdash/api/media/file/";
@@ -61,4 +61,29 @@ export function buildRobotsTxt(settings: RobotsSettings, origin: string): string
 		`Sitemap: ${sitemapUrl}`,
 		"",
 	].join("\n");
+}
+
+/** EmDash's robots.txt when the CMS is not initialized or settings cannot be read. */
+export const PERMISSIVE_ROBOTS_TXT = "User-agent: *\nAllow: /\n";
+
+/** Reads raw option values by name in one query, like EmDash's `OptionsRepository.getMany`. */
+export type ReadOptions = (names: string[]) => Promise<Map<string, unknown>>;
+
+/**
+ * robots.txt for the /robots.txt route. Like EmDash's route, it reads the settings straight
+ * from the database (not the cached site settings), so a crawl policy change applies at once,
+ * and returns the permissive file when there is no database or the read fails.
+ */
+export async function renderRobotsTxt(readOptions: ReadOptions | null, origin: string): Promise<string> {
+	if (!readOptions) return PERMISSIVE_ROBOTS_TXT;
+	try {
+		const options = await readOptions(["site:url", "site:seo"]);
+		const settings = {
+			url: options.get("site:url") as string | undefined,
+			seo: options.get("site:seo") as SeoSettings | undefined,
+		};
+		return buildRobotsTxt(settings, origin);
+	} catch {
+		return PERMISSIVE_ROBOTS_TXT;
+	}
 }
