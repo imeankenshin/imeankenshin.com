@@ -9,7 +9,8 @@ const apiKey = posthogConfig?.apiKey;
 // 本番はこのサイトのドメイン経由で送る（src/worker.ts のプロキシ）。追跡防止機能に PostHog のドメインを止められても計測できる。
 // 開発サーバーは src/worker.ts を通らないことがあるので直接送る。
 const apiHost = isDevelopment ? posthogConfig?.apiHost : POSTHOG_PROXY_PATH;
-const uiHost = posthogConfig ? getPostHogUiHost(posthogConfig.apiHost) : null;
+// api_host がプロキシのとき、SDK は管理画面の場所を推測できない。セルフホストなどは API ホストと同じとみなす。
+const uiHost = posthogConfig ? (getPostHogUiHost(posthogConfig.apiHost) ?? posthogConfig.apiHost) : null;
 ---
 
 {
@@ -19,7 +20,7 @@ const uiHost = posthogConfig ? getPostHogUiHost(posthogConfig.apiHost) : null;
 			posthog.init(apiKey, {
 				api_host: apiHost,
 				// api_host がプロキシのとき、ツールバーなどのリンク先を PostHog の管理画面にする
-				ui_host: uiHost || undefined,
+				ui_host: uiHost,
 				defaults: "2026-08-30",
 				// Consent (CookieConsent.astro, /privacy):
 				// - pending or rejected: no cookies/localStorage and no client-side IDs. PostHog identifies
