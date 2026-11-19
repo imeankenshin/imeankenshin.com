@@ -131,7 +131,8 @@ hover only): `getTocHeadings()` in `src/utils/toc.ts` collects h2–h4, and `Anc
 to the headings rendered by `PortableText`. `Base.astro` has a `footer` slot for the
 link on the right of the footer (pager, "ブログ一覧へ →").
 Analytics: PostHog (`src/components/posthog.astro`, only when `PUBLIC_POSTHOG_*` are set at build time) with
-`cookieless_mode: "on_reject"`. Visitors are counted cookielessly until they accept the cookie banner
+`cookieless_mode: "on_reject"`. In production the browser SDK talks to `/_relay/*` on this domain, which `src/worker.ts`
+forwards to PostHog (`src/utils/posthog-proxy.ts`), so tracker blockers that block `*.posthog.com` don't stop it. Visitors are counted cookielessly until they accept the cookie banner
 (`CookieConsent.astro`); accepting enables cookies and session replay. `src/scripts/consent.ts` drives the banner and the
 settings on `/privacy`. Error tracking: browser exceptions via `capture_exceptions`; SSR exceptions via `src/middleware.ts` →
 `src/utils/server-errors.ts` (`posthog-node`, edge build). `deploy.yml` uploads client source maps when the
