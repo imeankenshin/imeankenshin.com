@@ -45,7 +45,7 @@ const AUTHOR_NAME = "Kenshin Omura";
 // ヘッダー左上のロゴ文字。ページタイトル用のサイト名（Settings の title）とは別にドメイン名を出す
 const HEADER_WORDMARK = "imeankenshin.com";
 
-const { siteTitle, siteTagline, siteLogo } = resolveStarterSiteIdentity(
+const { siteTitle, siteTagline, siteLogo, useDefaultFavicon } = resolveStarterSiteIdentity(
 	settingsResult.data,
 );
 const titleIncludesSiteName =
@@ -78,6 +78,7 @@ const pageCtx = createPublicPageContext({
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>{fullTitle}</title>
+		{useDefaultFavicon && <link rel="icon" href="/favicon.svg" type="image/svg+xml" />}
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
