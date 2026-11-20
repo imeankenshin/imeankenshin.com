@@ -7,6 +7,7 @@ import { posthogConfig } from "@/utils/analytics";
 import { getPostHogRegion } from "@/utils/posthog-region";
 
 const ESTABLISHED = "2026年11月16日";
+const REVISED = "2026年11月20日";
 const OPERATOR = "Kenshin Omura";
 const CONTACT = { label: "X（@imeankenshin）", url: "https://x.com/imeankenshin" };
 const posthogRegion = posthogConfig ? getPostHogRegion(posthogConfig.apiHost) : null;
@@ -14,7 +15,9 @@ const posthogRegion = posthogConfig ? getPostHogRegion(posthogConfig.apiHost) : 
 
 <Base title="プライバシーポリシー" description="このサイトで取得する情報と Cookie の利用について">
 	<article>
-		<p class="mono-meta">{ESTABLISHED} 制定</p>
+		<p class="mono-meta">
+			{ESTABLISHED} 制定・{REVISED} 改定
+		</p>
 		<h1 class="display title">
 			<span class="marker">プライバシーポリシー</span>
 		</h1>
@@ -114,17 +117,6 @@ const posthogRegion = posthogConfig ? getPostHogRegion(posthogConfig.apiHost) : 
 			) : (
 				<p>現在、このサイトではアクセス解析を行っていません。</p>
 			)}
-
-			<h2 id="fonts">フォント（Google Fonts）</h2>
-			<p>
-				文字を表示するために、Google LLC の Google Fonts
-				からフォントを読み込んでいます。このとき、IP アドレスやブラウザの情報が Google
-				に送信されます。詳しくは
-				<a href="https://policies.google.com/privacy" rel="noopener noreferrer">
-					Google のプライバシーポリシー
-				</a>
-				をご覧ください。
-			</p>
 
 			<h2 id="use">取得した情報の使い道</h2>
 			<p>

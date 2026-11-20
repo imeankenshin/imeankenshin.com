@@ -2,7 +2,7 @@ import cloudflare from "@astrojs/cloudflare";
 import { cacheCloudflare } from "@astrojs/cloudflare/cache";
 import react from "@astrojs/react";
 import { hyperdrive, r2 } from "@emdash-cms/cloudflare";
-import { defineConfig } from "astro/config";
+import { defineConfig, fontProviders } from "astro/config";
 import emdash from "emdash/astro";
 import { viteDevtoolsAstroBuild } from "./scripts/vite-devtools-astro-build.mjs";
 
@@ -38,6 +38,39 @@ export default defineConfig({
 		"/sitemap.xml": { ...publicCache, tags: ["posts", "pages", "emdash:settings"] },
 		"/sitemap-[collection].xml": { ...publicCache, tags: ["posts", "pages", "emdash:settings"] },
 	},
+	// Google Fonts のフォントをビルド時にダウンロードして、このサイトから配信する（/_astro/fonts/）。
+	// ブラウザは Google に接続しない。CSS 変数は src/styles/theme.css の --font-* から参照する。
+	// <Font /> は @font-face をページごとにインラインで出すので、ウェイトは個別に並べず可変フォントの
+	// 範囲で指定する（Google は個別指定でも同じ可変フォントのファイルを返す。CSS だけが重複する）
+	fonts: [
+		{
+			provider: fontProviders.google(),
+			name: "Inter",
+			cssVariable: "--font-inter",
+			weights: ["400 700"],
+			styles: ["normal"],
+			// 和文は後ろの Noto Sans JP に任せる。ここで sans-serif を入れると和文がシステムフォントになる
+			fallbacks: [],
+		},
+		{
+			provider: fontProviders.google(),
+			name: "Noto Sans JP",
+			cssVariable: "--font-noto-sans-jp",
+			weights: ["400 700"],
+			styles: ["normal"],
+			// 和文のグリフは Google の CSS でサブセット名のない unicode-range の分割ファイルになっていて、
+			// 既定の subsets（latin）でも全部取り込まれる。ブラウザは使う文字の分だけ読み込む
+			fallbacks: ["Hiragino Sans", "system-ui", "sans-serif"],
+		},
+		{
+			provider: fontProviders.google(),
+			name: "JetBrains Mono",
+			cssVariable: "--font-jetbrains-mono",
+			weights: [400],
+			styles: ["normal"],
+			fallbacks: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
+		},
+	],
 	image: {
 		layout: "constrained",
 		responsiveStyles: true,

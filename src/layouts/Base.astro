@@ -1,5 +1,6 @@
 ---
 import { getMenuWithCacheHint, getSiteSettingsWithCacheHint } from "emdash";
+import { Font } from "astro:assets";
 import { EmDashHead, EmDashBodyStart, EmDashBodyEnd } from "emdash/ui";
 import { createPublicPageContext } from "emdash/page";
 import { resolveStarterSiteIdentity } from "@/utils/site-identity";
@@ -77,12 +78,9 @@ const pageCtx = createPublicPageContext({
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>{fullTitle}</title>
 		{useDefaultFavicon && <link rel="icon" href="/favicon.svg" type="image/svg+xml" />}
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400&family=Noto+Sans+JP:wght@400;500;700&display=swap"
-		/>
+		<Font cssVariable="--font-inter" />
+		<Font cssVariable="--font-noto-sans-jp" />
+		<Font cssVariable="--font-jetbrains-mono" />
 		<PostHog />
 		<EmDashHead page={pageCtx} />
 	</head>
