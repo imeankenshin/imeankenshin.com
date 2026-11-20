@@ -1,11 +1,11 @@
 ---
 import { getEmDashEntry, getSeoMeta, decodeSlug, getSiteSettings } from "emdash";
 import { PortableText } from "emdash/ui";
-import Base from "../layouts/Base.astro";
-import AnchoredBlock from "../components/AnchoredBlock.astro";
-import TableOfContents from "../components/TableOfContents.astro";
-import { resolveStarterSiteIdentity } from "../utils/site-identity";
-import { getTocHeadings, provideHeadingAnchors } from "../utils/toc";
+import Base from "@/layouts/Base.astro";
+import AnchoredBlock from "@/components/AnchoredBlock.astro";
+import TableOfContents from "@/components/TableOfContents.astro";
+import { resolveStarterSiteIdentity } from "@/utils/site-identity";
+import { getTocHeadings, provideHeadingAnchors } from "@/utils/toc";
 
 const slug = decodeSlug(Astro.params.slug);
 
@@ -51,7 +51,11 @@ provideHeadingAnchors(Astro.request, headings);
 	content={{ collection: "pages", id: page.data.id, slug }}
 >
 	<article>
-		<h1 class="display title"><span class="marker" {...page.edit.title}>{page.data.title}</span></h1>
+		<h1 class="display title">
+			<span class="marker" {...page.edit.title}>
+				{page.data.title}
+			</span>
+		</h1>
 		<div class="prose" {...page.edit.content}>
 			<PortableText value={page.data.content} components={{ block: AnchoredBlock }} />
 		</div>
@@ -60,7 +64,16 @@ provideHeadingAnchors(Astro.request, headings);
 </Base>
 
 <style>
-	article { max-width: var(--article); margin-inline: auto; }
-	.title { font-size: clamp(1.75rem, 5vw, 2.5rem); line-height: 1.45; }
-	.prose { max-width: var(--measure); margin: 3rem auto 0; }
+	article {
+		max-width: var(--article);
+		margin-inline: auto;
+	}
+	.title {
+		font-size: clamp(1.75rem, 5vw, 2.5rem);
+		line-height: 1.45;
+	}
+	.prose {
+		max-width: var(--measure);
+		margin: 3rem auto 0;
+	}
 </style>

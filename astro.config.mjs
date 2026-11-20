@@ -14,7 +14,7 @@ const publicCache = { maxAge: 300, swr: 86_400 };
 export default defineConfig({
 	i18n: {
 		locales: ["ja"],
-		defaultLocale: "ja"
+		defaultLocale: "ja",
 	},
 	output: "server",
 	adapter: cloudflare(),
@@ -25,7 +25,10 @@ export default defineConfig({
 		"/": { ...publicCache, tags: ["posts", "pages"] },
 		// Term names are rendered by the list/detail pages without taxonomy hints.
 		"/posts": { ...publicCache, tags: ["posts", "emdash:taxonomy:tag"] },
-		"/posts/[slug]": { ...publicCache, tags: ["posts", "emdash:taxonomy:tag", "emdash:taxonomy:category"] },
+		"/posts/[slug]": {
+			...publicCache,
+			tags: ["posts", "emdash:taxonomy:tag", "emdash:taxonomy:category"],
+		},
 		"/[slug]": { ...publicCache, tags: ["pages"] },
 		"/category/[slug]": { ...publicCache, tags: ["posts"] },
 		"/tag/[slug]": { ...publicCache, tags: ["posts"] },

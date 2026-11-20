@@ -1,28 +1,57 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { getPostHogProxyTarget, getPostHogUiHost, proxyPostHogRequest } from "../src/utils/posthog-proxy.ts";
+import {
+	getPostHogProxyTarget,
+	getPostHogUiHost,
+	proxyPostHogRequest,
+} from "../src/utils/posthog-proxy.ts";
 
 const target = (path, apiHost = "https://us.i.posthog.com") =>
 	getPostHogProxyTarget(new URL(`https://imeankenshin.com${path}`), apiHost)?.href ?? null;
 
 test("forwards only the proxy path", () => {
-	for (const path of ["/", "/posts", "/_relayx/e/", "/relay/e/", "/posts/_relay/e/"]) assert.equal(target(path), null, path);
+	for (const path of ["/", "/posts", "/_relayx/e/", "/relay/e/", "/posts/_relay/e/"])
+		assert.equal(target(path), null, path);
 });
 
 test("sends events to the API host and the SDK files to the assets host", () => {
 	assert.equal(target("/_relay/e/?ip=0&_=1"), "https://us.i.posthog.com/e/?ip=0&_=1");
 	assert.equal(target("/_relay/flags/?v=2"), "https://us.i.posthog.com/flags/?v=2");
-	assert.equal(target("/_relay/static/array.js"), "https://us-assets.i.posthog.com/static/array.js");
-	assert.equal(target("/_relay/array/phc_x/config.js"), "https://us-assets.i.posthog.com/array/phc_x/config.js");
-	assert.equal(target("/_relay/static/array.js", "https://eu.i.posthog.com"), "https://eu-assets.i.posthog.com/static/array.js");
-	assert.equal(target("/_relay/static/array.js", "https://ph.example.com"), "https://ph.example.com/static/array.js");
-	assert.equal(target("/_relay/static/array.js", "https://ph.example.com/ingest"), "https://ph.example.com/ingest/static/array.js");
-	assert.equal(target("/_relay/e/?v=1", "https://ph.example.com/ingest/"), "https://ph.example.com/ingest/e/?v=1");
+	assert.equal(
+		target("/_relay/static/array.js"),
+		"https://us-assets.i.posthog.com/static/array.js",
+	);
+	assert.equal(
+		target("/_relay/array/phc_x/config.js"),
+		"https://us-assets.i.posthog.com/array/phc_x/config.js",
+	);
+	assert.equal(
+		target("/_relay/static/array.js", "https://eu.i.posthog.com"),
+		"https://eu-assets.i.posthog.com/static/array.js",
+	);
+	assert.equal(
+		target("/_relay/static/array.js", "https://ph.example.com"),
+		"https://ph.example.com/static/array.js",
+	);
+	assert.equal(
+		target("/_relay/static/array.js", "https://ph.example.com/ingest"),
+		"https://ph.example.com/ingest/static/array.js",
+	);
+	assert.equal(
+		target("/_relay/e/?v=1", "https://ph.example.com/ingest/"),
+		"https://ph.example.com/ingest/e/?v=1",
+	);
 	assert.equal(target("/_relay/e/", "https://us.i.posthog.com/"), "https://us.i.posthog.com/e/");
 });
 
 test("never changes the upstream host", () => {
-	const paths = ["/_relay//evil.example/e/", "/_relay/%2F%2Fevil.example/", "/_relay/..//evil.example", "/_relay/%2e%2e//evil.example", "/_relay/@evil.example"];
+	const paths = [
+		"/_relay//evil.example/e/",
+		"/_relay/%2F%2Fevil.example/",
+		"/_relay/..//evil.example",
+		"/_relay/%2e%2e//evil.example",
+		"/_relay/@evil.example",
+	];
 	for (const apiHost of ["https://us.i.posthog.com", "https://us.i.posthog.com/ingest"]) {
 		for (const path of paths) {
 			const href = target(path, apiHost);
@@ -78,17 +107,26 @@ test("does not trust a client X-Forwarded-For without the Cloudflare IP", async 
 		sent = new Request(input, requestInit);
 		return new Response("ok");
 	});
-	const request = new Request("https://imeankenshin.com/_relay/static/array.js", { headers: { "X-Forwarded-For": "198.51.100.1" } });
+	const request = new Request("https://imeankenshin.com/_relay/static/array.js", {
+		headers: { "X-Forwarded-For": "198.51.100.1" },
+	});
 	await proxyPostHogRequest(request, new URL("https://us-assets.i.posthog.com/static/array.js"));
 	assert.equal(sent.method, "GET");
 	assert.equal(sent.headers.get("X-Forwarded-For"), null);
 });
 
 test("does not let PostHog set cookies on this site", async (t) => {
-	const upstreamHeaders = new Headers({ "content-type": "application/json", "cache-control": "no-cache" });
+	const upstreamHeaders = new Headers({
+		"content-type": "application/json",
+		"cache-control": "no-cache",
+	});
 	upstreamHeaders.append("set-cookie", "AWSALB=abc; Path=/");
 	upstreamHeaders.append("set-cookie", "other=1; Path=/");
-	t.mock.method(globalThis, "fetch", async () => new Response('{"status":1}', { status: 200, headers: upstreamHeaders }));
+	t.mock.method(
+		globalThis,
+		"fetch",
+		async () => new Response('{"status":1}', { status: 200, headers: upstreamHeaders }),
+	);
 	const response = await proxyPostHogRequest(
 		new Request("https://imeankenshin.com/_relay/e/", { method: "POST", body: "data" }),
 		new URL("https://us.i.posthog.com/e/"),

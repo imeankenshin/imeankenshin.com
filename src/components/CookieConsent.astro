@@ -4,20 +4,27 @@
 ---
 
 <section class="cookie-banner" data-consent-banner hidden aria-labelledby="cookie-banner-title">
-	<p id="cookie-banner-title" class="cookie-banner-title">Cookie の利用について</p>
+	<p id="cookie-banner-title" class="cookie-banner-title">
+		Cookie の利用について
+	</p>
 	<p class="cookie-banner-text">
-		サイトの改善のため、Cookie を使ったアクセス解析とセッションリプレイ（画面の操作の記録）を行ってもよいですか？
+		サイトの改善のため、Cookie
+		を使ったアクセス解析とセッションリプレイ（画面の操作の記録）を行ってもよいですか？
 		拒否した場合も、Cookie を使わない計測（日をまたいで閲覧者を識別しないもの）は行います。
 		<a href="/privacy">プライバシーポリシー</a>
 	</p>
 	<div class="consent-actions">
-		<button type="button" class="consent-button" data-consent-choice="denied">拒否する</button>
-		<button type="button" class="consent-button" data-consent-choice="granted">同意する</button>
+		<button type="button" class="consent-button" data-consent-choice="denied">
+			拒否する
+		</button>
+		<button type="button" class="consent-button" data-consent-choice="granted">
+			同意する
+		</button>
 	</div>
 </section>
 
 <script>
-	import "../scripts/consent";
+	import "@/scripts/consent";
 </script>
 
 <style>
@@ -36,7 +43,20 @@
 		box-shadow: 4px 4px 0 var(--fg);
 		font-family: var(--font-ui);
 	}
-	.cookie-banner[hidden] { display: none; }
-	.cookie-banner-title { margin: 0; color: var(--fg); font-size: 0.9375rem; font-weight: 700; line-height: 1.4; }
-	.cookie-banner-text { margin: 0.5rem 0 1rem; color: var(--text); font-size: 0.8125rem; line-height: 1.8; }
+	.cookie-banner[hidden] {
+		display: none;
+	}
+	.cookie-banner-title {
+		margin: 0;
+		color: var(--fg);
+		font-size: 0.9375rem;
+		font-weight: 700;
+		line-height: 1.4;
+	}
+	.cookie-banner-text {
+		margin: 0.5rem 0 1rem;
+		color: var(--text);
+		font-size: 0.8125rem;
+		line-height: 1.8;
+	}
 </style>

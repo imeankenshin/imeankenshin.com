@@ -9,7 +9,8 @@ export function getPostHogRegion(apiHost: string): "米国" | "EU" | null {
 	} catch {
 		return null;
 	}
-	if (/^(us|us-assets)\.i\.posthog\.com$/.test(hostname) || hostname === "app.posthog.com") return "米国";
+	if (/^(us|us-assets)\.i\.posthog\.com$/.test(hostname) || hostname === "app.posthog.com")
+		return "米国";
 	if (/^(eu|eu-assets)\.i\.posthog\.com$/.test(hostname)) return "EU";
 	return null;
 }

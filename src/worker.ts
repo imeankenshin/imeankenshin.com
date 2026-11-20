@@ -14,7 +14,9 @@ export default {
 			// プレビューは読み取り専用なので転送しない（下の isPublicPreviewRequest で POST は 404）。
 			// 開発中は SDK が PostHog に直接送る（posthog.astro）ので、プロキシは本番ビルドだけで動かす。
 			const posthogTarget =
-				import.meta.env.PROD && posthogConfig && getPostHogProxyTarget(new URL(request.url), posthogConfig.apiHost);
+				import.meta.env.PROD &&
+				posthogConfig &&
+				getPostHogProxyTarget(new URL(request.url), posthogConfig.apiHost);
 			if (posthogTarget) return proxyPostHogRequest(request, posthogTarget);
 			return handler.fetch(request, env, context);
 		}

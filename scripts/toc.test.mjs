@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { getHeadingAnchor, getTocHeadings, provideHeadingAnchors, slugifyHeading } from "../src/utils/toc.ts";
+import {
+	getHeadingAnchor,
+	getTocHeadings,
+	provideHeadingAnchors,
+	slugifyHeading,
+} from "../src/utils/toc.ts";
 
 const block = (key, style, ...texts) => ({
 	_type: "block",

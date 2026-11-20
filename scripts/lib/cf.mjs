@@ -25,7 +25,11 @@ export function cfWithBody(args, body) {
 	} catch (error) {
 		// error.message には実行コマンドが入るが、秘密情報は一時ファイル側にしかない
 		const status = /** @type {{ status?: number }} */ (error).status;
-		throw new Error(`cf ${args.slice(0, 3).join(" ")} が失敗しました（終了コード ${status ?? "不明"}）`);
+		// cause を付けると Node が元のエラー（cf の出力を含む）も表示するので付けない
+		// oxlint-disable-next-line preserve-caught-error
+		throw new Error(
+			`cf ${args.slice(0, 3).join(" ")} が失敗しました（終了コード ${status ?? "不明"}）`,
+		);
 	} finally {
 		rmSync(dir, { recursive: true, force: true });
 	}

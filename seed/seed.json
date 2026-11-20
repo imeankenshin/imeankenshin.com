@@ -16,14 +16,7 @@
 			"label": "Posts",
 			"labelSingular": "Post",
 			"urlPattern": "/posts/{slug}",
-			"supports": [
-				"drafts",
-				"revisions",
-				"preview",
-				"scheduling",
-				"search",
-				"seo"
-			],
+			"supports": ["drafts", "revisions", "preview", "scheduling", "search", "seo"],
 			"fields": [
 				{
 					"slug": "title",
@@ -55,13 +48,7 @@
 			"label": "Pages",
 			"labelSingular": "Page",
 			"urlPattern": "/{slug}",
-			"supports": [
-				"drafts",
-				"revisions",
-				"preview",
-				"search",
-				"seo"
-			],
+			"supports": ["drafts", "revisions", "preview", "search", "seo"],
 			"fields": [
 				{
 					"slug": "title",
@@ -85,9 +72,7 @@
 			"label": "Categories",
 			"labelSingular": "Category",
 			"hierarchical": true,
-			"collections": [
-				"posts"
-			],
+			"collections": ["posts"],
 			"terms": [
 				{
 					"slug": "general",
@@ -104,9 +89,7 @@
 			"label": "Tags",
 			"labelSingular": "Tag",
 			"hierarchical": false,
-			"collections": [
-				"posts"
-			],
+			"collections": ["posts"],
 			"terms": [
 				{
 					"slug": "hello",
@@ -285,12 +268,8 @@
 					]
 				},
 				"taxonomies": {
-					"category": [
-						"general"
-					],
-					"tag": [
-						"hello"
-					]
+					"category": ["general"],
+					"tag": ["hello"]
 				}
 			}
 		]

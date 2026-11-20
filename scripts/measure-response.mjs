@@ -9,12 +9,23 @@ if (!Number.isInteger(count) || count < 1 || !Number.isFinite(budget) || budget 
 }
 const samples = [];
 for (let i = 0; i < count; i++) {
-	const output = execFileSync("curl", [
-		"--silent", "--show-error", "--max-time", "20",
-		"--dump-header", "-", "--output", "/dev/null",
-		"--write-out", '\n{"status":%{http_code},"ttfb":%{time_starttransfer},"tls":%{time_appconnect},"total":%{time_total}}',
-		url.href,
-	], { encoding: "utf8" });
+	const output = execFileSync(
+		"curl",
+		[
+			"--silent",
+			"--show-error",
+			"--max-time",
+			"20",
+			"--dump-header",
+			"-",
+			"--output",
+			"/dev/null",
+			"--write-out",
+			'\n{"status":%{http_code},"ttfb":%{time_starttransfer},"tls":%{time_appconnect},"total":%{time_total}}',
+			url.href,
+		],
+		{ encoding: "utf8" },
+	);
 	const lines = output.trim().split(/\r?\n/);
 	const timing = JSON.parse(lines.pop());
 	const headers = new Headers();
@@ -35,7 +46,7 @@ for (let i = 0; i < count; i++) {
 	samples.push(sample);
 	console.log(JSON.stringify({ sample: i + 1, ...sample }));
 }
-const sorted = samples.map((s) => s.ttfbMs).sort((a, b) => a - b);
+const sorted = samples.map((s) => s.ttfbMs).toSorted((a, b) => a - b);
 const percentile = (p) => sorted[Math.ceil(sorted.length * p) - 1];
 const summary = {
 	url: url.href,
