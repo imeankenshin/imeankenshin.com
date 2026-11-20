@@ -1,6 +1,6 @@
 // Cookie の同意 UI（CookieConsent.astro のバナーと /privacy の設定欄）を PostHog の同意状態とつなぐ。
 // 公開 HTML はエッジでキャッシュされるので、表示の切り替えはすべてクライアントで行う。
-import { CONSENT_STATUS_LABELS, parseConsentChoice, type ConsentStatus } from "../utils/consent";
+import { CONSENT_STATUS_LABELS, parseConsentChoice, type ConsentStatus } from "@/utils/consent";
 
 interface PostHogConsentApi {
 	get_explicit_consent_status(): ConsentStatus;

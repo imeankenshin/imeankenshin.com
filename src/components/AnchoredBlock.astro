@@ -6,7 +6,7 @@
  */
 import type { ComponentProps } from "astro/types";
 import { emdashComponents } from "emdash/ui";
-import { getHeadingAnchor } from "../utils/toc";
+import { getHeadingAnchor } from "@/utils/toc";
 
 // emdash/ui は astro-portabletext の `type Block` と Block コンポーネントを同じ名前で再エクスポートしていて、
 // TypeScript は `Block` を型として解決してしまう（ts(1362)）。同じコンポーネントを emdashComponents から取る。
@@ -18,4 +18,6 @@ const id = getHeadingAnchor(Astro.request, Astro.props.node._key);
 const blockProps = (id ? { ...Astro.props, id } : Astro.props) as Props;
 ---
 
-<Block {...blockProps}><slot /></Block>
+<Block {...blockProps}>
+	<slot />
+</Block>

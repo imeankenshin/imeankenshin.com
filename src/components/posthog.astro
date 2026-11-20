@@ -1,8 +1,8 @@
 ---
 // PostHog browser SDK (web snippet). Rendered once in the <head> of src/layouts/Base.astro.
 // PUBLIC_* values are inlined at build time, so builds without them (e.g. PR previews) ship no analytics.
-import { posthogConfig } from "../utils/analytics";
-import { getPostHogUiHost, POSTHOG_PROXY_PATH } from "../utils/posthog-proxy";
+import { posthogConfig } from "@/utils/analytics";
+import { getPostHogUiHost, POSTHOG_PROXY_PATH } from "@/utils/posthog-proxy";
 
 const isDevelopment = import.meta.env.DEV;
 const apiKey = posthogConfig?.apiKey;
@@ -10,58 +10,60 @@ const apiKey = posthogConfig?.apiKey;
 // 開発サーバーは src/worker.ts を通らないことがあるので直接送る。
 const apiHost = isDevelopment ? posthogConfig?.apiHost : POSTHOG_PROXY_PATH;
 // api_host がプロキシのとき、SDK は管理画面の場所を推測できない。セルフホストなどは API ホストと同じとみなす。
-const uiHost = posthogConfig ? (getPostHogUiHost(posthogConfig.apiHost) ?? posthogConfig.apiHost) : null;
+const uiHost = posthogConfig
+	? (getPostHogUiHost(posthogConfig.apiHost) ?? posthogConfig.apiHost)
+	: null;
 ---
 
-{
-	posthogConfig ? (
-		<script is:inline define:vars={{ apiKey, apiHost, uiHost, isDevelopment }}>
-			!function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],Object.defineProperty(u,"toString",{configurable:!0,enumerable:!0,writable:!0,value:function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e}}),Object.defineProperty(u.people,"toString",{configurable:!0,enumerable:!0,writable:!0,value:function(){return u.toString(1)+".people (stub)"}}),o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagResult reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys getNextSurveyStep onSessionId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
-			posthog.init(apiKey, {
-				api_host: apiHost,
-				// api_host がプロキシのとき、ツールバーなどのリンク先を PostHog の管理画面にする
-				ui_host: uiHost,
-				defaults: "2026-08-30",
-				// Consent (CookieConsent.astro, /privacy):
-				// - pending or rejected: no cookies/localStorage and no client-side IDs. PostHog identifies
-				//   visitors with a daily server-side hash ("Cookieless server hash mode" must stay on in the
-				//   project settings). Session replay does not run in this mode.
-				// - accepted: normal persistence (cookie + localStorage) and session replay.
-				// opt_out_capturing_by_default treats "pending" like "rejected", so visitors who ignore the
-				// banner are still counted cookielessly instead of not at all.
-				cookieless_mode: "on_reject",
-				opt_out_capturing_by_default: true,
-				// Web analytics: $pageview on load and on history changes, $pageleave for time on page and
-				// bounce rate. Both match the "defaults" values; set explicitly because web analytics needs them.
-				capture_pageview: "history_change",
-				capture_pageleave: true,
-				// Heatmaps regardless of the project toggle (click/scroll positions, no identifiers by themselves).
-				capture_heatmaps: true,
-				// Session replay starts only after consent and when it is enabled in the project settings.
-				// Form input values are masked (also the SDK default).
-				session_recording: { maskAllInputs: true },
-				capture_exceptions: {
-					capture_unhandled_errors: true,
-					capture_unhandled_rejections: true,
-					capture_console_errors: false,
-				},
-				logs: {
-					serviceName: "imeankenshin.com-web",
-					environment: isDevelopment ? "development" : "production",
-				},
-				// src/scripts/consent.ts waits for this: the snippet stub has no get_explicit_consent_status.
-				// Hand over the SDK instance itself: when loaded runs, window.posthog can still be the stub.
-				loaded: function (instance) {
-					window.__posthogInstance = instance;
-					window.dispatchEvent(new Event("posthog:loaded"));
-				},
-			});
-		</script>
-	) : (
-		import.meta.env.DEV && (
-			<script is:inline>
-				console.warn("PostHog is disabled: set PUBLIC_POSTHOG_PROJECT_TOKEN and PUBLIC_POSTHOG_HOST in .env");
-			</script>
-		)
-	)
-}
+{posthogConfig ? (
+	<script is:inline define:vars={{ apiKey, apiHost, uiHost, isDevelopment }}>
+		// prettier-ignore
+		// oxlint-disable-next-line -- PostHog の公式スニペット（minify 済み）。整形も lint もしない
+		!function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],Object.defineProperty(u,"toString",{configurable:!0,enumerable:!0,writable:!0,value:function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e}}),Object.defineProperty(u.people,"toString",{configurable:!0,enumerable:!0,writable:!0,value:function(){return u.toString(1)+".people (stub)"}}),o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagResult reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys getNextSurveyStep onSessionId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+		posthog.init(apiKey, {
+			api_host: apiHost,
+			// api_host がプロキシのとき、ツールバーなどのリンク先を PostHog の管理画面にする
+			ui_host: uiHost,
+			defaults: "2026-08-30",
+			// Consent (CookieConsent.astro, /privacy):
+			// - pending or rejected: no cookies/localStorage and no client-side IDs. PostHog identifies
+			//   visitors with a daily server-side hash ("Cookieless server hash mode" must stay on in the
+			//   project settings). Session replay does not run in this mode.
+			// - accepted: normal persistence (cookie + localStorage) and session replay.
+			// opt_out_capturing_by_default treats "pending" like "rejected", so visitors who ignore the
+			// banner are still counted cookielessly instead of not at all.
+			cookieless_mode: "on_reject",
+			opt_out_capturing_by_default: true,
+			// Web analytics: $pageview on load and on history changes, $pageleave for time on page and
+			// bounce rate. Both match the "defaults" values; set explicitly because web analytics needs them.
+			capture_pageview: "history_change",
+			capture_pageleave: true,
+			// Heatmaps regardless of the project toggle (click/scroll positions, no identifiers by themselves).
+			capture_heatmaps: true,
+			// Session replay starts only after consent and when it is enabled in the project settings.
+			// Form input values are masked (also the SDK default).
+			session_recording: { maskAllInputs: true },
+			capture_exceptions: {
+				capture_unhandled_errors: true,
+				capture_unhandled_rejections: true,
+				capture_console_errors: false,
+			},
+			logs: {
+				serviceName: "imeankenshin.com-web",
+				environment: isDevelopment ? "development" : "production",
+			},
+			// src/scripts/consent.ts waits for this: the snippet stub has no get_explicit_consent_status.
+			// Hand over the SDK instance itself: when loaded runs, window.posthog can still be the stub.
+			loaded: function (instance) {
+				window.__posthogInstance = instance;
+				window.dispatchEvent(new Event("posthog:loaded"));
+			},
+		});
+	</script>
+) : (
+	import.meta.env.DEV && <script is:inline>
+		console.warn(
+			"PostHog is disabled: set PUBLIC_POSTHOG_PROJECT_TOKEN and PUBLIC_POSTHOG_HOST in .env",
+		);
+	</script>
+)}

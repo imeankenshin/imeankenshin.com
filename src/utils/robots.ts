@@ -74,7 +74,10 @@ export type ReadOptions = (names: string[]) => Promise<Map<string, unknown>>;
  * from the database (not the cached site settings), so a crawl policy change applies at once,
  * and returns the permissive file when there is no database or the read fails.
  */
-export async function renderRobotsTxt(readOptions: ReadOptions | null, origin: string): Promise<string> {
+export async function renderRobotsTxt(
+	readOptions: ReadOptions | null,
+	origin: string,
+): Promise<string> {
 	if (!readOptions) return PERMISSIVE_ROBOTS_TXT;
 	try {
 		const options = await readOptions(["site:url", "site:seo"]);

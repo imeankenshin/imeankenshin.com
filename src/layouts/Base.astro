@@ -2,11 +2,11 @@
 import { getMenuWithCacheHint, getSiteSettingsWithCacheHint } from "emdash";
 import { EmDashHead, EmDashBodyStart, EmDashBodyEnd } from "emdash/ui";
 import { createPublicPageContext } from "emdash/page";
-import { resolveStarterSiteIdentity } from "../utils/site-identity";
-import PostHog from "../components/posthog.astro";
-import CookieConsent from "../components/CookieConsent.astro";
-import { posthogConfig } from "../utils/analytics";
-import "../styles/theme.css";
+import { resolveStarterSiteIdentity } from "@/utils/site-identity";
+import PostHog from "@/components/posthog.astro";
+import CookieConsent from "@/components/CookieConsent.astro";
+import { posthogConfig } from "@/utils/analytics";
+import "@/styles/theme.css";
 
 interface Props {
 	title: string;
@@ -49,9 +49,7 @@ const { siteTitle, siteTagline, siteLogo, useDefaultFavicon } = resolveStarterSi
 	settingsResult.data,
 );
 const titleIncludesSiteName =
-	title === siteTitle ||
-	title.endsWith(` | ${siteTitle}`) ||
-	title.endsWith(` — ${siteTitle}`);
+	title === siteTitle || title.endsWith(` | ${siteTitle}`) || title.endsWith(` — ${siteTitle}`);
 const fullTitle = titleIncludesSiteName ? title : `${title} — ${siteTitle}`;
 const pageDescription = description ?? siteTagline;
 // ロゴがトップへのリンクを兼ねるので、メニューのトップ（"/"）へのリンクはヘッダーに出さない
@@ -94,31 +92,27 @@ const pageCtx = createPublicPageContext({
 		<header class="site-header">
 			<div class="wrap">
 				<a class="site-title" href="/">
-					{
-						siteLogo ? (
-							<img
-								src={siteLogo.url}
-								alt={siteLogo.alt || HEADER_WORDMARK}
-								style="height:32px;width:auto;display:block;"
-							/>
-						) : (
-							HEADER_WORDMARK
-						)
-					}
+					{siteLogo ? (
+						<img
+							src={siteLogo.url}
+							alt={siteLogo.alt || HEADER_WORDMARK}
+							style="height:32px;width:auto;display:block;"
+						/>
+					) : (
+						HEADER_WORDMARK
+					)}
 				</a>
 				<nav class="site-nav" aria-label="メイン">
-					{
-						navItems.map((item) => (
-							<a
-								href={item.url}
-								target={item.target}
-								rel={item.target === "_blank" ? "noopener noreferrer" : undefined}
-								aria-current={Astro.url.pathname === item.url ? "page" : undefined}
-							>
-								{item.label}
-							</a>
-						))
-					}
+					{navItems.map((item) => (
+						<a
+							href={item.url}
+							target={item.target}
+							rel={item.target === "_blank" ? "noopener noreferrer" : undefined}
+							aria-current={Astro.url.pathname === item.url ? "page" : undefined}
+						>
+							{item.label}
+						</a>
+					))}
 				</nav>
 			</div>
 		</header>
@@ -132,7 +126,9 @@ const pageCtx = createPublicPageContext({
 		<footer class="site-footer">
 			<div class="wrap">
 				<span class="footer-meta">
-					<span>© {new Date().getFullYear()} {AUTHOR_NAME}</span>
+					<span>
+						© {new Date().getFullYear()} {AUTHOR_NAME}
+					</span>
 					<a href="/privacy" aria-current={Astro.url.pathname === "/privacy" ? "page" : undefined}>
 						プライバシーポリシー
 					</a>
@@ -150,7 +146,8 @@ const pageCtx = createPublicPageContext({
 				const originalFetch = window.fetch;
 				window.fetch = function (input, init) {
 					const promise = originalFetch.apply(this, arguments);
-					const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+					const url =
+						typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
 					if (new URL(url, location.href).pathname === "/_emdash/api/search") {
 						promise
 							.then((response) => (response.ok ? response.clone().json() : undefined))
@@ -177,14 +174,12 @@ const pageCtx = createPublicPageContext({
 			 * 開発サーバーのハブが配信する embedded.js を、Vite のモジュールグラフを通さずに読み込む。
 			 * import.meta.env.DEV はビルド時に false になり、本番 HTML には出力されない。
 			 */
-			import.meta.env.DEV && (
-				<script is:inline type="module">
-					const s = document.createElement("script");
-					s.type = "module";
-					s.src = "/__devtools/embedded.js";
-					document.body.appendChild(s);
-				</script>
-			)
+			import.meta.env.DEV && <script is:inline type="module">
+				const s = document.createElement("script");
+				s.type = "module";
+				s.src = "/__devtools/embedded.js";
+				document.body.appendChild(s);
+			</script>
 		}
 	</body>
 </html>

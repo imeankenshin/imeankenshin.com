@@ -1,8 +1,8 @@
 ---
 import { getEmDashEntry, getMenuWithCacheHint, getSiteSettings } from "emdash";
 import { PortableText } from "emdash/ui";
-import Base from "../layouts/Base.astro";
-import { resolveStarterSiteIdentity } from "../utils/site-identity";
+import Base from "@/layouts/Base.astro";
+import { resolveStarterSiteIdentity } from "@/utils/site-identity";
 
 // トップの自己紹介は Pages コレクションの "home"、リンク集は "links" メニューから読む。
 const [intro, linksResult, settings] = await Promise.all([
@@ -39,7 +39,12 @@ function iconFor(url: string) {
 }
 ---
 
-<Base title={siteTitle} description={siteTagline} canonical={new URL("/", Astro.url).href} content={home ? { collection: "pages", id: home.data.id, slug: "home" } : undefined}>
+<Base
+	title={siteTitle}
+	description={siteTagline}
+	canonical={new URL("/", Astro.url).href}
+	content={home ? { collection: "pages", id: home.data.id, slug: "home" } : undefined}
+>
 	<section class="intro">
 		<h1 class="display headline" {...home?.edit.title}>
 			<span class="marker">{home ? home.data.title : siteTitle}</span>
@@ -54,7 +59,11 @@ function iconFor(url: string) {
 					const icon = iconFor(item.url);
 					return (
 						<li>
-							<a href={item.url} target={item.target} rel={item.target === "_blank" ? "noopener noreferrer" : undefined}>
+							<a
+								href={item.url}
+								target={item.target}
+								rel={item.target === "_blank" ? "noopener noreferrer" : undefined}
+							>
 								{icon && (
 									<svg viewBox="0 0 256 256" width="18" height="18" aria-hidden="true">
 										<path d={icon} fill="currentColor" />
@@ -71,7 +80,9 @@ function iconFor(url: string) {
 </Base>
 
 <style>
-	.intro { padding-top: clamp(1rem, 6vw, 5.5rem); }
+	.intro {
+		padding-top: clamp(1rem, 6vw, 5.5rem);
+	}
 	.headline {
 		max-width: 40rem;
 		font-size: clamp(2.125rem, 6.5vw, 3.25rem);
@@ -84,7 +95,9 @@ function iconFor(url: string) {
 		color: var(--text-soft);
 		line-height: 2;
 	}
-	.body :global(p) { margin: 0 0 1rem; }
+	.body :global(p) {
+		margin: 0 0 1rem;
+	}
 	.links {
 		display: flex;
 		flex-wrap: wrap;
@@ -109,14 +122,30 @@ function iconFor(url: string) {
 		line-height: 1.2;
 		text-decoration: none;
 		transform: rotate(1.5deg);
-		transition: transform 0.15s ease, box-shadow 0.15s ease;
+		transition:
+			transform 0.15s ease,
+			box-shadow 0.15s ease;
 	}
 	/* 1 つ目だけ塗りつぶし。傾きを交互に変えて、手で貼ったような並びにする */
-	.links li:first-child a { background: var(--fg); color: var(--bg); transform: rotate(-2deg); }
-	.links li:nth-child(3n) a { transform: rotate(-1deg); }
-	.links li a:hover { transform: translate(-1px, -1px) rotate(0deg); box-shadow: 4px 4px 0 var(--fg); }
-	.links li a:active { transform: translate(2px, 2px) rotate(0deg); box-shadow: 1px 1px 0 var(--fg); }
+	.links li:first-child a {
+		background: var(--fg);
+		color: var(--bg);
+		transform: rotate(-2deg);
+	}
+	.links li:nth-child(3n) a {
+		transform: rotate(-1deg);
+	}
+	.links li a:hover {
+		transform: translate(-1px, -1px) rotate(0deg);
+		box-shadow: 4px 4px 0 var(--fg);
+	}
+	.links li a:active {
+		transform: translate(2px, 2px) rotate(0deg);
+		box-shadow: 1px 1px 0 var(--fg);
+	}
 	@media (prefers-reduced-motion: reduce) {
-		.links a { transition: none; }
+		.links a {
+			transition: none;
+		}
 	}
 </style>

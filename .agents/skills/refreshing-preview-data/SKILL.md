@@ -9,10 +9,10 @@ All PR previews share one DB, R2 bucket and KV, separate from production (README
 A refresh makes them a fresh **snapshot** of production: the DB rows and the media files they reference.
 Both halves move together — a reset DB points at R2 keys that only exist once the media is copied.
 
-| | Production | Preview |
-|---|---|---|
-| Neon (project `young-scene-04976765`) | branch `production` | branch `preview` = `br-lingering-wind-a1tcw2eo`, behind Hyperdrive `imeankenshin-com-preview-db` |
-| R2 | `imeankenshin-media` | `imeankenshin-media-preview` |
+|                                       | Production           | Preview                                                                                          |
+| ------------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------ |
+| Neon (project `young-scene-04976765`) | branch `production`  | branch `preview` = `br-lingering-wind-a1tcw2eo`, behind Hyperdrive `imeankenshin-com-preview-db` |
+| R2                                    | `imeankenshin-media` | `imeankenshin-media-preview`                                                                     |
 
 KV holds only sessions; leave it alone.
 

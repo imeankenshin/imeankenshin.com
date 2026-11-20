@@ -1,12 +1,8 @@
 ---
-import {
-	getTaxonomyTermsWithCacheHint,
-	getEmDashCollection,
-	decodeSlug,
-} from "emdash";
-import Base from "../../layouts/Base.astro";
-import PostCard from "../../components/PostCard.astro";
-import { findTermBySlug } from "../../utils/taxonomy";
+import { getTaxonomyTermsWithCacheHint, getEmDashCollection, decodeSlug } from "emdash";
+import Base from "@/layouts/Base.astro";
+import PostCard from "@/components/PostCard.astro";
+import { findTermBySlug } from "@/utils/taxonomy";
 
 const slug = decodeSlug(Astro.params.slug);
 const termsResult = await getTaxonomyTermsWithCacheHint("category", {
@@ -37,27 +33,42 @@ if (Astro.cache?.enabled) {
 
 <Base title={`カテゴリ: ${term.label}`} description={`「${term.label}」の記事一覧`}>
 	<p class="mono-meta kicker">カテゴリ</p>
-	<h1 class="display page-title"><span class="marker">{term.label}</span></h1>
+	<h1 class="display page-title">
+		<span class="marker">{term.label}</span>
+	</h1>
 
-	{
-		posts.length === 0 ? (
-			<p class="lead">まだ記事がありません。</p>
-		) : (
-			<ul class="post-grid">
-				{posts.map((post) => (
-					<li><PostCard post={post} /></li>
-				))}
-			</ul>
-		)
-	}
+	{posts.length === 0 ? (
+		<p class="lead">まだ記事がありません。</p>
+	) : (
+		<ul class="post-grid">
+			{posts.map((post) => (
+				<li>
+					<PostCard post={post} />
+				</li>
+			))}
+		</ul>
+	)}
 
 	<nav slot="footer" class="pager" aria-label="ページ送り">
-		{cursor && <a class="text-link" href={`/category/${term.slug}`}>← 最初のページ</a>}
-		{nextCursor && <a class="text-link" href={`/category/${term.slug}?cursor=${encodeURIComponent(nextCursor)}`}>もっと見る →</a>}
+		{cursor && (
+			<a class="text-link" href={`/category/${term.slug}`}>
+				← 最初のページ
+			</a>
+		)}
+		{nextCursor && (
+			<a class="text-link" href={`/category/${term.slug}?cursor=${encodeURIComponent(nextCursor)}`}>
+				もっと見る →
+			</a>
+		)}
 	</nav>
 </Base>
 
 <style>
-	.kicker { margin: 0 0 0.75rem; }
-	.pager { display: flex; gap: 1.5rem; }
+	.kicker {
+		margin: 0 0 0.75rem;
+	}
+	.pager {
+		display: flex;
+		gap: 1.5rem;
+	}
 </style>

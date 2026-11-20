@@ -8,6 +8,8 @@ For humans on a workstation. Agents: don't run these; see "Verification for agen
 pnpm dev              # Start local Postgres (docker compose) + the Astro dev server
 pnpm deploy           # astro build && wrangler deploy (cf cannot build Astro 7 yet)
 npx emdash types      # Regenerate TypeScript types from a running site
+pnpm format           # Format with Oxfmt (`pnpm format:check` only checks)
+pnpm lint             # Lint with Oxlint (`pnpm lint:fix` applies safe fixes)
 ```
 
 The admin UI is at `http://localhost:4321/_emdash/admin`.
@@ -22,7 +24,8 @@ the PR's Workers preview instead of building locally.
   `astro dev`/`build`/`check`, or `wrangler dev`/`deploy`. `astro check` loads the Cloudflare
   adapter and Vite, so it costs as much as a build.
 - **Fine to run locally:** `pnpm install --frozen-lockfile` (first, before any other command),
-  `pnpm test` (`node --test`, light), and reading or grepping code. Use `pnpm exec wrangler`,
+  `pnpm test` (`node --test`, light), `pnpm format`/`pnpm format:check` (Oxfmt), `pnpm lint` (Oxlint),
+  and reading or grepping code. Use `pnpm exec wrangler`,
   never `npx wrangler` (it downloads a different version than the lockfile).
 - **If a command is killed** (`Killed`, exit 137, SIGKILL), don't retry it or switch to another
   heavy command. Stop and report it.
@@ -30,7 +33,8 @@ the PR's Workers preview instead of building locally.
   other agents share `/tmp`.
 - **To verify a change,** push the branch and open a PR (only when the task includes a PR;
   otherwise say build verification is pending). Two workflows run on the PR:
-  - `CI` (`.github/workflows/ci.yml`), job `check`: `pnpm test`, `pnpm typecheck`, `pnpm build`.
+  - `CI` (`.github/workflows/ci.yml`), job `check`: `pnpm format:check`, `pnpm lint`, `pnpm test`,
+    `pnpm typecheck`, `pnpm build`.
   - `PR preview` (`.github/workflows/preview.yml`): builds with `CLOUDFLARE_ENV=preview` and
     deploys the PR to its own Worker, `imeankenshin-com-pr-<number>`.
   - Wait for the checks: `gh pr checks <number>`. On failure, read the log:
@@ -90,6 +94,13 @@ Cloudflare Workers + Hyperdrive (PostgreSQL) + R2. See README.md. Use Wrangler f
 - Image fields are objects (`{ src, alt }`), not strings. Use `<Image image={...} />` from `"emdash/ui"`.
 - `entry.id` is the slug (for URLs). `entry.data.id` is the database ULID (for API calls like `getEntryTerms`).
 - When Astro's cache is enabled, pass content-query hints to `Astro.cache.set(cacheHint)`. Use the `WithCacheHint` variants for site settings, menus, taxonomies, and widget areas rendered by cached routes.
+- Run `pnpm format` and `pnpm lint` before committing; CI fails on unformatted files and on lint warnings.
+  Config: `.oxfmtrc.json` (tabs, Astro via `@astrojs/compiler-rs`) and `.oxlintrc.json`. Keep vendored code
+  as is with `// prettier-ignore` / `// oxlint-disable-next-line -- reason` (e.g. the PostHog snippet in `posthog.astro`).
+- Imports in `src/` use the `@/` alias (`@/*` → `src/*`, `tsconfig.json` `paths`) instead of `../`; Oxlint
+  (`import/no-relative-parent-imports`) rejects parent-relative imports there. `./` for the same directory is fine.
+  Exception: `node --test` (`scripts/*.test.mjs`) does not know the alias, so modules the tests import
+  (`src/utils/*.ts`) and their own imports must not use `@/`. The tests import them with `../src/...`.
 - Taxonomy names in queries must match the seed's `"name"` field exactly (e.g., `"category"` not `"categories"`).
 
 ## This Site

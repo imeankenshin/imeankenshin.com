@@ -1,0 +1,28 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"plugins": ["typescript", "unicorn", "oxc", "import"],
+	"categories": {
+		"correctness": "error",
+		"suspicious": "warn"
+	},
+	"rules": {
+		"no-underscore-dangle": "off",
+		"import/no-unassigned-import": "off",
+		"import/no-absolute-path": "error",
+		"import/no-self-import": "error",
+		"import/no-duplicates": "error",
+		"import/no-cycle": "error"
+	},
+	"overrides": [
+		{
+			"files": ["src/**"],
+			"rules": {
+				"import/no-relative-parent-imports": "error"
+			}
+		}
+	],
+	"env": {
+		"builtin": true
+	},
+	"ignorePatterns": ["emdash-env.d.ts", "worker-configuration.d.ts"]
+}

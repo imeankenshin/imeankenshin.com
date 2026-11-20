@@ -12,7 +12,8 @@ export const POSTHOG_PROXY_PATH = "/_relay";
  */
 export function getPostHogProxyTarget(url: URL, apiHost: string): URL | null {
 	const { pathname } = url;
-	if (pathname !== POSTHOG_PROXY_PATH && !pathname.startsWith(`${POSTHOG_PROXY_PATH}/`)) return null;
+	if (pathname !== POSTHOG_PROXY_PATH && !pathname.startsWith(`${POSTHOG_PROXY_PATH}/`))
+		return null;
 
 	let target: URL;
 	try {
@@ -22,7 +23,10 @@ export function getPostHogProxyTarget(url: URL, apiHost: string): URL | null {
 	}
 	const path = pathname.slice(POSTHOG_PROXY_PATH.length) || "/";
 	if (path.startsWith("/static/") || path.startsWith("/array/")) {
-		target.hostname = target.hostname.replace(/^(us|eu)\.i\.posthog\.com$/, "$1-assets.i.posthog.com");
+		target.hostname = target.hostname.replace(
+			/^(us|eu)\.i\.posthog\.com$/,
+			"$1-assets.i.posthog.com",
+		);
 	}
 	// 文字列の連結で URL 全体を作らない（"//evil.example" のようなパスでホストが変わらないように）。
 	// PUBLIC_POSTHOG_HOST にパスがある（自前のプロキシなど）ときは、その下に付ける。

@@ -1,0 +1,12 @@
+{
+	"$schema": "./node_modules/oxfmt/configuration_schema.json",
+	"useTabs": true,
+	"astro": true,
+	"ignorePatterns": [
+		"emdash-env.d.ts",
+		"worker-configuration.d.ts",
+		".agents/skills/building-emdash-site/",
+		".agents/skills/creating-plugins/",
+		".agents/skills/emdash-cli/"
+	]
+}

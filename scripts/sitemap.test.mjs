@@ -9,7 +9,10 @@ test("uses the root URL for the home page and its language alternates", () => {
     <xhtml:link rel="alternate" hreflang="ja" href="https://imeankenshin.com/home/" />
   </url>
 </urlset>`;
-	assert.equal(canonicalizeHomeInSitemap(xml), xml.replace("/home</loc>", "/</loc>").replace('/home/"', '/"'));
+	assert.equal(
+		canonicalizeHomeInSitemap(xml),
+		xml.replace("/home</loc>", "/</loc>").replace('/home/"', '/"'),
+	);
 });
 
 test("leaves other page URLs and image URLs alone", () => {

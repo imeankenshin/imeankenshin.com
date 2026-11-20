@@ -12,7 +12,7 @@ test("accepts only the two consent choices", () => {
 });
 
 test("has a label for every consent status", () => {
-	assert.deepEqual(Object.keys(CONSENT_STATUS_LABELS).sort(), ["denied", "granted", "pending"]);
+	assert.deepEqual(Object.keys(CONSENT_STATUS_LABELS).toSorted(), ["denied", "granted", "pending"]);
 });
 
 test("derives the PostHog Cloud region from the API host", async () => {

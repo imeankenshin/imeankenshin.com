@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { getPublicOrigin, OptionsRepository } from "emdash/api/route-utils";
-import { renderRobotsTxt } from "../utils/robots";
+import { renderRobotsTxt } from "@/utils/robots";
 
 export const prerender = false;
 

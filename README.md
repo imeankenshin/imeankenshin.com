@@ -4,12 +4,12 @@ Kenshin の個人サイト＋ブログ。[EmDash](https://docs.emdashcms.com/)�
 
 ## 構成
 
-| | 本番 | ローカル開発 |
-|---|---|---|
-| ランタイム | Cloudflare Workers（`@astrojs/cloudflare`） | 同じ Worker ランタイム（`astro dev`） |
-| DB | PostgreSQL（任意のプロバイダ）← Hyperdrive 経由 | Docker の PostgreSQL 17（`compose.yaml`） |
-| メディア | R2（`MEDIA` バインディング） | ローカル R2 シミュレーション |
-| 予約公開など | Cron Trigger（毎分）→ `src/worker.ts` | dev サーバーのタイマー |
+|              | 本番                                            | ローカル開発                              |
+| ------------ | ----------------------------------------------- | ----------------------------------------- |
+| ランタイム   | Cloudflare Workers（`@astrojs/cloudflare`）     | 同じ Worker ランタイム（`astro dev`）     |
+| DB           | PostgreSQL（任意のプロバイダ）← Hyperdrive 経由 | Docker の PostgreSQL 17（`compose.yaml`） |
+| メディア     | R2（`MEDIA` バインディング）                    | ローカル R2 シミュレーション              |
+| 予約公開など | Cron Trigger（毎分）→ `src/worker.ts`           | dev サーバーのタイマー                    |
 
 ## ローカル開発
 
@@ -23,6 +23,9 @@ pnpm dev          # Postgres コンテナを起動してから astro dev
 - サイト: http://localhost:4321/
 - 管理画面: http://localhost:4321/_emdash/admin/ （初回はセットアップ画面。「Include sample content」を残すと初期コンテンツが入る）
 - DB を止める: `pnpm db:down`（データは Docker ボリュームに残る）
+- 整形: `pnpm format`（[Oxfmt](https://oxc.rs/docs/guide/usage/formatter)、設定は `.oxfmtrc.json`）。CI は `pnpm format:check` で確認する
+- Lint: `pnpm lint`（[Oxlint](https://oxc.rs/docs/guide/usage/linter)、設定は `.oxlintrc.json`）。警告も CI で失敗にする
+- `src/` 内の import は `../` ではなく `@/`（`src/` を指すエイリアス、`tsconfig.json` の `paths`）で書く。Oxlint が `../` をエラーにする
 
 ## デプロイ（Cloudflare）
 
@@ -33,14 +36,14 @@ pnpm dev          # Postgres コンテナを起動してから astro dev
 
 ### 作成済みのリソース
 
-| リソース | 名前 / ID | 作成方法 |
-|---|---|---|
-| Neon プロジェクト | `imeankenshin.com`（`young-scene-04976765`, aws-ap-southeast-1, PG 18） | 既存 |
-| Neon ロール / DB | `emdash` / `emdash`（ブランチ `production`、DB 所有者 = `emdash`） | `neon roles create` / `neon databases create` |
-| Hyperdrive | `imeankenshin-com-db`（`e3208792…`、キャッシュ無効、Neon の直接接続） | `pnpm cf:hyperdrive:create`（`cf`） |
-| R2 バケット | `imeankenshin-media`（APAC） | `pnpm cf:r2:create`（`cf`） |
-| KV（Astro セッション） | `imeankenshin-com-session` | `cf kv namespaces create` |
-| Worker 配置 | `placement.region = aws:ap-southeast-1`（Neon の近く） | `wrangler.jsonc` |
+| リソース               | 名前 / ID                                                               | 作成方法                                      |
+| ---------------------- | ----------------------------------------------------------------------- | --------------------------------------------- |
+| Neon プロジェクト      | `imeankenshin.com`（`young-scene-04976765`, aws-ap-southeast-1, PG 18） | 既存                                          |
+| Neon ロール / DB       | `emdash` / `emdash`（ブランチ `production`、DB 所有者 = `emdash`）      | `neon roles create` / `neon databases create` |
+| Hyperdrive             | `imeankenshin-com-db`（`e3208792…`、キャッシュ無効、Neon の直接接続）   | `pnpm cf:hyperdrive:create`（`cf`）           |
+| R2 バケット            | `imeankenshin-media`（APAC）                                            | `pnpm cf:r2:create`（`cf`）                   |
+| KV（Astro セッション） | `imeankenshin-com-session`                                              | `cf kv namespaces create`                     |
+| Worker 配置            | `placement.region = aws:ap-southeast-1`（Neon の近く）                  | `wrangler.jsonc`                              |
 
 Hyperdrive を作り直すときは、Neon の直接接続（pooled ではない）URL を渡す:
 
@@ -97,13 +100,13 @@ pnpm cache:check http://localhost:8787
 
 ### GitHub Actions による自動デプロイ
 
-| イベント | 動作 |
-|---|---|
-| PR 作成・更新・再オープン（fork・Dependabot を含む） | `CI` の `check` ジョブでテスト・型チェック・ビルド。`main` へのマージに必須 |
-| 同じリポジトリの PR 作成・更新・再オープン | プレビュー用にビルドし、`imeankenshin-com-pr-<番号>` Worker を作成・更新し、PR コメントに URL を掲載 |
-| PR クローズ（マージを含む） | 該当 PR の Worker を削除 |
-| `main` への push（PR マージを含む） | 型チェック・ビルド後、`https://imeankenshin.com` に本番デプロイ |
-| Actions の `Deploy production` → Run workflow（`main`） | 本番へ手動再デプロイ |
+| イベント                                                | 動作                                                                                                 |
+| ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| PR 作成・更新・再オープン（fork・Dependabot を含む）    | `CI` の `check` ジョブでテスト・型チェック・ビルド。`main` へのマージに必須                          |
+| 同じリポジトリの PR 作成・更新・再オープン              | プレビュー用にビルドし、`imeankenshin-com-pr-<番号>` Worker を作成・更新し、PR コメントに URL を掲載 |
+| PR クローズ（マージを含む）                             | 該当 PR の Worker を削除                                                                             |
+| `main` への push（PR マージを含む）                     | 型チェック・ビルド後、`https://imeankenshin.com` に本番デプロイ                                      |
+| Actions の `Deploy production` → Run workflow（`main`） | 本番へ手動再デプロイ                                                                                 |
 
 ワークフローは `.github/workflows/ci.yml`、`preview.yml`、`deploy.yml`。
 `main` はルールセットで保護し、PR 経由の変更と、最新の `main` を取り込んだ状態での `check` の成功を必須にしている（直接 push・force push・削除は不可）。
@@ -115,9 +118,9 @@ fork と Dependabot の PR は Secrets を利用できないため、プレビ�
 
 GitHub リポジトリの **Settings → Secrets and variables → Actions** に以下を登録する。
 
-| 種類 | 名前 | 値 |
-|---|---|---|
-| Secret | `CLOUDFLARE_API_TOKEN` | Cloudflare のデプロイ用 API Token（登録済み） |
+| 種類     | 名前                    | 値                                             |
+| -------- | ----------------------- | ---------------------------------------------- |
+| Secret   | `CLOUDFLARE_API_TOKEN`  | Cloudflare のデプロイ用 API Token（登録済み）  |
 | Variable | `CLOUDFLARE_ACCOUNT_ID` | `20bd7cf00ed4b81a10356ab97c27b6e0`（登録済み） |
 
 Token は対象アカウントと `imeankenshin.com` ゾーンに限定する。

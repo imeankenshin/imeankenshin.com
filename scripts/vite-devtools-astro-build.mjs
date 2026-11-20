@@ -12,6 +12,8 @@ const BUILD_COMMAND = {
 	},
 };
 
+const getBuildCommand = (ctx) => ({ ...BUILD_COMMAND, cwd: ctx.cwd ?? process.cwd() });
+
 /** @returns {import("vite").Plugin} */
 export function viteDevtoolsAstroBuild() {
 	let current;
@@ -19,8 +21,6 @@ export function viteDevtoolsAstroBuild() {
 	/** 起動処理中のビルド。同時に押されたときに 2 本目を起動しないため、最初の await より前に設定する */
 	let starting;
 	let runCount = 0;
-
-	const getBuildCommand = (ctx) => ({ ...BUILD_COMMAND, cwd: ctx.cwd ?? process.cwd() });
 
 	async function spawnBuild(ctx) {
 		if (current) await current.terminate().catch(() => {});
@@ -64,7 +64,11 @@ export function viteDevtoolsAstroBuild() {
 		devtools: {
 			setup(ctx) {
 				const overrides = [
-					{ name: "vite:rolldown:get-build-command", type: "query", handler: async () => getBuildCommand(ctx) },
+					{
+						name: "vite:rolldown:get-build-command",
+						type: "query",
+						handler: async () => getBuildCommand(ctx),
+					},
 					{ name: "vite:rolldown:run-build", type: "action", handler: () => startBuild(ctx) },
 					{ name: "vite:rolldown:wait-for-build", type: "action", handler: () => waitForBuild() },
 				];

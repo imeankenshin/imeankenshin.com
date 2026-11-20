@@ -1,8 +1,8 @@
 ---
 import { getEmDashCollection } from "emdash";
 import LiveSearch from "emdash/ui/search";
-import Base from "../../layouts/Base.astro";
-import PostCard from "../../components/PostCard.astro";
+import Base from "@/layouts/Base.astro";
+import PostCard from "@/components/PostCard.astro";
 
 const cursor = Astro.url.searchParams.get("cursor") || undefined;
 const {
@@ -18,7 +18,9 @@ if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
 ---
 
 <Base title="ブログ">
-	<h1 class="display page-title"><span class="marker">ブログ</span></h1>
+	<h1 class="display page-title">
+		<span class="marker">ブログ</span>
+	</h1>
 	<p class="lead">技術のこと、日々のこと。思いついたままに書いています。</p>
 
 	<div class="post-search">
@@ -28,32 +30,56 @@ if (Astro.cache?.enabled) Astro.cache.set(cacheHint);
 			routeMap={{ posts: "/posts/:slug" }}
 		>
 			<!-- クラス名は LiveSearch のスクリプトが要素を探すのに使うので変えない -->
-			<div slot="loading" class="emdash-live-search-loading">検索中…</div>
-			<div slot="no-results" class="emdash-live-search-no-results">見つかりませんでした</div>
+			<div slot="loading" class="emdash-live-search-loading">
+				検索中…
+			</div>
+			<div slot="no-results" class="emdash-live-search-no-results">
+				見つかりませんでした
+			</div>
 		</LiveSearch>
 	</div>
 
-	{
-		posts.length === 0 ? (
-			<p class="lead">まだ記事がありません。</p>
-		) : (
-			<ul class="post-grid">
-				{posts.map((post) => (
-					<li><PostCard post={post} /></li>
-				))}
-			</ul>
-		)
-	}
+	{posts.length === 0 ? (
+		<p class="lead">まだ記事がありません。</p>
+	) : (
+		<ul class="post-grid">
+			{posts.map((post) => (
+				<li>
+					<PostCard post={post} />
+				</li>
+			))}
+		</ul>
+	)}
 
 	<nav slot="footer" class="pager" aria-label="ページ送り">
-		{cursor && <a class="text-link" href="/posts">← 最初のページ</a>}
-		{nextCursor && <a class="text-link" href={`/posts?cursor=${encodeURIComponent(nextCursor)}`}>もっと見る →</a>}
+		{cursor && (
+			<a class="text-link" href="/posts">
+				← 最初のページ
+			</a>
+		)}
+		{nextCursor && (
+			<a class="text-link" href={`/posts?cursor=${encodeURIComponent(nextCursor)}`}>
+				もっと見る →
+			</a>
+		)}
 	</nav>
 </Base>
 
 <style>
-	.pager { display: flex; gap: 1.5rem; }
-	.post-search { max-width: 24rem; margin-top: 2rem; }
-	.post-search :global(.emdash-live-search-input) { width: 100%; box-sizing: border-box; }
-	.post-search :global(.emdash-live-search-input::placeholder) { color: var(--muted); opacity: 1; }
+	.pager {
+		display: flex;
+		gap: 1.5rem;
+	}
+	.post-search {
+		max-width: 24rem;
+		margin-top: 2rem;
+	}
+	.post-search :global(.emdash-live-search-input) {
+		width: 100%;
+		box-sizing: border-box;
+	}
+	.post-search :global(.emdash-live-search-input::placeholder) {
+		color: var(--muted);
+		opacity: 1;
+	}
 </style>
