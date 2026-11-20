@@ -134,7 +134,10 @@ Site settings have `title` and `tagline`.
 
 Based on the Brilliant design `imeankesnhin.com / main` (Home, Blogs, Blog Post boards).
 Japanese UI (`lang="ja"`). Dates use `formatDate()` in `src/utils/date.ts` (`2026年11月02日`, Asia/Tokyo — Workers run in UTC).
-Fonts: Inter (UI), Noto Sans JP (body), JetBrains Mono (dates/code) from Google Fonts; headings use `.display`
+Fonts: Inter (UI), Noto Sans JP (body), JetBrains Mono (dates/code) via the Astro Fonts API (`fonts` in `astro.config.mjs`,
+`<Font />` in `Base.astro`): downloaded from Google at build time and served from `/_astro/fonts/`, so browsers never
+contact Google. `theme.css` builds `--font-ui` etc. from the generated `--font-inter`/`--font-noto-sans-jp`/`--font-jetbrains-mono`;
+headings use `.display`
 (Toppan Bunkyu Midashi Gothic when installed, else a bold Japanese sans) with the yellow `.marker` highlight.
 Favicon: the logo in `public/favicon.svg`, linked from `Base.astro`. If a favicon is set in the admin Site Settings,
 `EmDashHead` outputs that one and the default link is left out.

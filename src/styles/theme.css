@@ -15,10 +15,12 @@
 	--code-fg: #f3efe6;
 	--button-bg: #ffffff;
 
-	--font-ui: "Inter", "Noto Sans JP", system-ui, sans-serif;
-	--font-body: "Noto Sans JP", "Hiragino Sans", system-ui, sans-serif;
-	--font-display: "Toppan Bunkyu Midashi Gothic", "Hiragino Sans", "Noto Sans JP", sans-serif;
-	--font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+	/* --font-inter / --font-noto-sans-jp / --font-jetbrains-mono は Astro の Fonts API が
+	   <Font />（Base.astro）で定義する。フォールバックは astro.config.mjs の fonts に書く */
+	--font-ui: var(--font-inter), var(--font-noto-sans-jp);
+	--font-body: var(--font-noto-sans-jp);
+	--font-display: "Toppan Bunkyu Midashi Gothic", "Hiragino Sans", var(--font-noto-sans-jp);
+	--font-mono: var(--font-jetbrains-mono);
 
 	--page: 60rem; /* ヘッダー・一覧の幅 (960px) */
 	--article: 45rem; /* 記事の見出し・カバー (720px) */
