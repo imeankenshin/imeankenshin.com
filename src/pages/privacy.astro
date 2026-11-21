@@ -39,8 +39,11 @@ const CONTACT = { label: "X（@imeankenshin）", url: "https://x.com/imeankenshi
 						<li>ページの読み込みや表示にかかった時間などの、表示速度の指標</li>
 					</ul>
 					<p>
-						送信の際には IP アドレスも Cloudflare に届き、国の推定に使われます。送信された情報は
-						Cloudflare のサーバーに保存されます。Cloudflare での情報の扱いは、
+						通信の仕組み上、IP アドレスも Cloudflare
+						に届き、国の推定に使われます。アクセス解析のデータとして Cloudflare
+						のサーバーに保存されるのは、上の項目と推定した国です。Cloudflare
+						は、このサービスで閲覧者の個人データを集めないとしています。Cloudflare
+						での情報の扱いは、
 						<a href="https://www.cloudflare.com/privacypolicy/" rel="noopener noreferrer">
 							Cloudflare のプライバシーポリシー
 						</a>
