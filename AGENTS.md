@@ -149,6 +149,8 @@ link on the right of the footer (pager, "ブログ一覧へ →").
 Analytics: Cloudflare Web Analytics (`src/components/CloudflareWebAnalytics.astro`, at the end of `<body>` in `Base.astro`).
 It renders only in production builds with `PUBLIC_CF_WEB_ANALYTICS_TOKEN` set (`deploy.yml` passes the GitHub Actions
 variable), so PR previews and the dev server send nothing. It uses no cookies or localStorage, so there is no consent banner.
+Editor views (draft previews, visual editing; `isEditorView()` in `src/utils/editor-view.ts`) leave the beacon out and set
+`<meta name="referrer" content="no-referrer">`, so unpublished URLs never reach Cloudflare.
 The site in the Cloudflare dashboard uses the JS snippet, not automatic injection (both would count page views twice).
 Server errors go to Workers Logs (`observability` in `wrangler.jsonc`). When you change what is collected, update the
 text of `src/pages/privacy.astro` too.
