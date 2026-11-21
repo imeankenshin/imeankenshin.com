@@ -1,0 +1,15 @@
+---
+// Cloudflare Web Analytics のビーコン。Base.astro の </body> の直前で 1 回だけ描画する。
+// Cookie も localStorage も使わないので、同意バナーは要らない。
+// 計測の内容を変えたら src/pages/privacy.astro の文面も更新する。
+import { webAnalyticsToken } from "@/utils/analytics";
+---
+
+{webAnalyticsToken && (
+	<script
+		is:inline
+		type="module"
+		src="https://static.cloudflareinsights.com/beacon.min.js"
+		data-cf-beacon={JSON.stringify({ token: webAnalyticsToken })}
+	></script>
+)}

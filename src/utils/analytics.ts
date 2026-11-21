@@ -1,9 +1,7 @@
 /**
- * PostHog の公開設定。PUBLIC_* はビルド時に埋め込まれる。
- * どちらかが無いビルド（PR プレビューなど）は計測も同意バナーも出さない。
+ * Cloudflare Web Analytics のサイトトークン（公開値）。PUBLIC_* はビルド時に埋め込まれる。
+ * 無いビルド（PR プレビュー）と開発サーバーは計測しない（開発中の閲覧を本番のデータに混ぜない）。
  */
-const apiKey = import.meta.env.PUBLIC_POSTHOG_PROJECT_TOKEN;
-const apiHost = import.meta.env.PUBLIC_POSTHOG_HOST;
+const token = import.meta.env.PUBLIC_CF_WEB_ANALYTICS_TOKEN;
 
-export const posthogConfig: { apiKey: string; apiHost: string } | null =
-	apiKey && apiHost ? { apiKey, apiHost } : null;
+export const webAnalyticsToken: string | null = import.meta.env.PROD && token ? token : null;

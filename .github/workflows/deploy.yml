@@ -20,9 +20,6 @@ jobs:
     environment:
       name: production
       url: https://imeankenshin.com
-    env:
-      # Optional: a PostHog personal API key with error tracking write access, for source map uploads
-      POSTHOG_CLI_API_KEY: ${{ secrets.POSTHOG_CLI_API_KEY }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -39,23 +36,8 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm build
         env:
-          # Inlined into the client bundle at build time (public values, not secrets)
-          PUBLIC_POSTHOG_PROJECT_TOKEN: ${{ vars.PUBLIC_POSTHOG_PROJECT_TOKEN }}
-          PUBLIC_POSTHOG_HOST: ${{ vars.PUBLIC_POSTHOG_HOST }}
-          # Client source maps for PostHog error tracking, only when the next step can upload them
-          CLIENT_SOURCEMAPS: ${{ env.POSTHOG_CLI_API_KEY != '' }}
-      # Uploads the client source maps so browser stack traces show the original code, then deletes the
-      # .map files and their sourceMappingURL comments so they are not served. Skipped without the secret.
-      - name: Upload source maps to PostHog
-        if: env.POSTHOG_CLI_API_KEY != ''
-        env:
-          POSTHOG_CLI_PROJECT_ID: ${{ vars.POSTHOG_CLI_PROJECT_ID }}
-          PUBLIC_POSTHOG_HOST: ${{ vars.PUBLIC_POSTHOG_HOST }}
-        run: |
-          # The CLI talks to the app host (us.posthog.com), not the ingestion host (us.i.posthog.com)
-          pnpm dlx @posthog/cli@0.19.4 --host "${PUBLIC_POSTHOG_HOST/.i.posthog.com/.posthog.com}" \
-            sourcemap process --directory dist/client --delete-after \
-            --release-name imeankenshin.com --release-version "$GITHUB_SHA"
+          # Cloudflare Web Analytics site token, inlined into the HTML at build time (public, not a secret)
+          PUBLIC_CF_WEB_ANALYTICS_TOKEN: ${{ vars.PUBLIC_CF_WEB_ANALYTICS_TOKEN }}
       - name: Deploy to Cloudflare Workers
         run: pnpm exec wrangler deploy
         env:
