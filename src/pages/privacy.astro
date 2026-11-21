@@ -55,8 +55,11 @@ const CONTACT = { label: "X（@imeankenshin）", url: "https://x.com/imeankenshi
 			<p>
 				このサイトは Cloudflare, Inc. の「Cloudflare Workers」で動いています。Worker
 				に届いたリクエストの記録（日時、メソッド、URL など）は、不具合の調査のために Cloudflare
-				のログ（Workers Logs）に残ります。ページを Cloudflare のキャッシュから返したときは Worker
-				に届かないので記録されません。アクセス解析と違い、JavaScript
+				のログ（Workers Logs）に残ります。ページを Cloudflare
+				のキャッシュから返したときは、そのアクセス自体は Worker
+				に届かないので記録されません。ただし、キャッシュを新しくするために Cloudflare が裏で Worker
+				を呼ぶことがあり、そのときはページの URL
+				と日時が記録されます。アクセス解析と違い、JavaScript
 				を無効にしていても記録の対象になります。このログは数日（最長 7
 				日）で自動的に削除されます。Cloudflare での情報の扱いは、
 				<a href="https://www.cloudflare.com/privacypolicy/" rel="noopener noreferrer">
