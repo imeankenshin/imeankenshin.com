@@ -4,9 +4,8 @@ import { Font } from "astro:assets";
 import { EmDashHead, EmDashBodyStart, EmDashBodyEnd } from "emdash/ui";
 import { createPublicPageContext } from "emdash/page";
 import { resolveStarterSiteIdentity } from "@/utils/site-identity";
-import PostHog from "@/components/posthog.astro";
-import CookieConsent from "@/components/CookieConsent.astro";
-import { posthogConfig } from "@/utils/analytics";
+import { isEditorView } from "@/utils/editor-view";
+import CloudflareWebAnalytics from "@/components/CloudflareWebAnalytics.astro";
 import "@/styles/theme.css";
 
 interface Props {
@@ -56,6 +55,10 @@ const pageDescription = description ?? siteTagline;
 // ロゴがトップへのリンクを兼ねるので、メニューのトップ（"/"）へのリンクはヘッダーに出さない
 const navItems = (menuResult.data?.items ?? []).filter((item) => item.url !== "/");
 
+// 下書きのプレビュー・編集から別のページへ移るとき、未公開の記事の URL を Referer で渡さない
+// （移動先のページのアクセス解析が参照元として Cloudflare に送るため）
+const hideReferrer = isEditorView(Astro.url);
+
 const pageCtx = createPublicPageContext({
 	Astro,
 	kind: content ? "content" : "custom",
@@ -76,12 +79,12 @@ const pageCtx = createPublicPageContext({
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		{hideReferrer && <meta name="referrer" content="no-referrer" />}
 		<title>{fullTitle}</title>
 		{useDefaultFavicon && <link rel="icon" href="/favicon.svg" type="image/svg+xml" />}
 		<Font cssVariable="--font-inter" />
 		<Font cssVariable="--font-noto-sans-jp" />
 		<Font cssVariable="--font-jetbrains-mono" />
-		<PostHog />
 		<EmDashHead page={pageCtx} />
 	</head>
 	<body>
@@ -135,37 +138,8 @@ const pageCtx = createPublicPageContext({
 			</div>
 		</footer>
 
-		<script is:inline>
-			// LiveSearch has no events, and it shows the same "no results" UI for empty results and for
-			// failed requests. So observe its search API responses instead: one event per successful
-			// search response (requests are debounced by LiveSearch; aborted/failed ones are skipped).
-			// The query text is not sent.
-			if (window.posthog && document.querySelector("emdash-live-search")) {
-				const originalFetch = window.fetch;
-				window.fetch = function (input, init) {
-					const promise = originalFetch.apply(this, arguments);
-					const url =
-						typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
-					if (new URL(url, location.href).pathname === "/_emdash/api/search") {
-						promise
-							.then((response) => (response.ok ? response.clone().json() : undefined))
-							.then((body) => {
-								const data = body && (body.data || body);
-								const items = data && (data.items || data.results);
-								if (Array.isArray(items)) {
-									window.posthog.capture("site_search_completed", { result_count: items.length });
-								}
-							})
-							.catch(() => {});
-					}
-					return promise;
-				};
-			}
-		</script>
-
-		{posthogConfig && <CookieConsent />}
-
 		<EmDashBodyEnd page={pageCtx} />
+		<CloudflareWebAnalytics />
 		{
 			/*
 			 * Vite DevTools のドック。Astro は SSR で HTML を返すため Vite の自動注入が効かない。

@@ -1,19 +1,17 @@
 ---
-// プライバシーポリシー（Cookie の説明と同意の変更）。
-// 計測の設定（src/components/posthog.astro）と一致させる必要があるので、CMS ではなくコードで持つ。
+// プライバシーポリシー。
+// 計測の設定（src/components/CloudflareWebAnalytics.astro）と一致させる必要があるので、CMS ではなくコードで持つ。
 // 計測を変えたら、この文面も更新する。
 import Base from "@/layouts/Base.astro";
-import { posthogConfig } from "@/utils/analytics";
-import { getPostHogRegion } from "@/utils/posthog-region";
+import { webAnalyticsToken } from "@/utils/analytics";
 
 const ESTABLISHED = "2026年11月16日";
-const REVISED = "2026年11月20日";
+const REVISED = "2026年11月21日";
 const OPERATOR = "Kenshin Omura";
 const CONTACT = { label: "X（@imeankenshin）", url: "https://x.com/imeankenshin" };
-const posthogRegion = posthogConfig ? getPostHogRegion(posthogConfig.apiHost) : null;
 ---
 
-<Base title="プライバシーポリシー" description="このサイトで取得する情報と Cookie の利用について">
+<Base title="プライバシーポリシー" description="このサイトで取得する情報と、その使い道について">
 	<article>
 		<p class="mono-meta">
 			{ESTABLISHED} 制定・{REVISED} 改定
@@ -27,105 +25,75 @@ const posthogRegion = posthogConfig ? getPostHogRegion(posthogConfig.apiHost) : 
 				{OPERATOR}です。
 			</p>
 
-			<h2 id="analytics">アクセス解析（PostHog）</h2>
-			<p>
-				読まれ方を知ってサイトを改善するために、PostHog, Inc.
-				のアクセス解析サービス「PostHog」を使っています。
-				ページを開くと、次の情報がブラウザからこのサイトのサーバーを経由して PostHog
-				のサーバーに送信されます。
-			</p>
-			<ul>
-				<li>閲覧したページの URL・タイトルと、参照元（リファラー）</li>
-				<li>ページを開いた時刻と離れた時刻（滞在時間）</li>
-				<li>クリックした位置・要素とその文字、スクロールした深さ（ヒートマップ）</li>
-				<li>ブラウザ・OS・端末の種類、画面の大きさ、言語の設定</li>
-				<li>
-					IP アドレス（おおよその地域の推定と、下の「Cookie を使わない計測」の識別に使います）
-				</li>
-				<li>ページで起きた JavaScript のエラー（エラーの内容と、起きた場所）</li>
-				<li>サイト内検索の結果の件数（検索した語句は送信しません）</li>
-			</ul>
-			<p>
-				サーバーでページを作るときにエラーが起きた場合も、エラーの内容とページの URL を PostHog
-				に送ります。これには閲覧者を識別する情報は含みません。
-			</p>
-			<p>
-				送信された情報は PostHog のサーバー{posthogRegion && `（${posthogRegion}）`}
-				に保存され、PostHog の利用プランで決まった保存期間を過ぎると削除されます。PostHog
-				での情報の扱いは、
-				<a href="https://posthog.com/privacy" rel="noopener noreferrer">
-					PostHog のプライバシーポリシー
-				</a>
-				をご覧ください。
-			</p>
-
-			<h2 id="cookies">Cookie の利用と選択</h2>
-			<p>
-				Cookie
-				を使った計測をするかどうかは、初めて訪れたときに画面の下に出る確認で選べます。選んだ内容は、下の「Cookie
-				の設定」でいつでも変えられます。
-			</p>
-			<h3>「同意する」を選んだ場合</h3>
-			<p>
-				PostHog がランダムな識別子を Cookie と localStorage
-				に保存し、日をまたいだ訪問も同じ閲覧者として集計します。
-				あわせて、セッションリプレイ（ページの表示内容、マウスの動き、クリック、スクロールの記録）を行います。
-				フォームに入力した内容は記録しません。これらは、あなたの同意に基づいて行います。
-			</p>
-			<h3>「拒否する」を選んだ場合と、まだ選んでいない場合</h3>
-			<p>
-				Cookie や localStorage に識別子を保存しません。PostHog のサーバーが IP
-				アドレスやブラウザの情報から日ごとに変わる値を計算し、
-				同じ日の同じ閲覧者をまとめて集計します（Cookie
-				を使わない計測）。日をまたいだ識別と、セッションリプレイは行いません。
-				この計測は、サイトの改善と不具合の調査という運営者の正当な利益に基づいて行います。止めてほしい場合は、下の連絡先までご連絡ください。
-			</p>
-			<p>
-				どちらを選んだかは、次の訪問でも覚えておくために、ブラウザの localStorage に保存します。
-			</p>
-
-			<h2 id="settings">Cookie の設定</h2>
-			{posthogConfig ? (
-				<div class="consent-panel">
-					<p data-consent-loading>
-						計測のスクリプトが読み込まれると、ここで設定を変えられます。広告ブロッカーなどで読み込まれていない場合、計測は行われていません。
+			<h2 id="analytics">アクセス解析（Cloudflare Web Analytics）</h2>
+			{webAnalyticsToken ? (
+				<>
+					<p>
+						どのページがどのくらい読まれているかを知ってサイトを改善するために、Cloudflare, Inc.
+						のアクセス解析サービス「Cloudflare Web Analytics」を使っています。
+						ページを開くと、次の情報がブラウザから Cloudflare のサーバーに送信されます。
 					</p>
-					<div data-consent-settings hidden>
-						<p>
-							現在の設定: <strong data-consent-status aria-live="polite"></strong>
-						</p>
-						<div class="consent-actions" role="group" aria-label="Cookie を使った計測">
-							<button
-								type="button"
-								class="consent-button"
-								data-consent-choice="denied"
-								aria-pressed="false"
-							>
-								拒否する
-							</button>
-							<button
-								type="button"
-								class="consent-button"
-								data-consent-choice="granted"
-								aria-pressed="false"
-							>
-								同意する
-							</button>
-						</div>
-					</div>
-				</div>
+					<ul>
+						<li>
+							閲覧したページの URL（このページの URL
+							のクエリ文字列は記録されません）と、参照元（リファラー）
+						</li>
+						<li>ブラウザ・OS・端末の種類</li>
+						<li>ページの読み込みや表示にかかった時間などの、表示速度の指標（Core Web Vitals）</li>
+						<li>
+							表示速度に影響したページ内の要素の情報（要素の CSS
+							セレクターや、最も大きく表示された画像などのファイルの URL）
+						</li>
+					</ul>
+					<p>
+						通信の仕組み上、IP アドレスも Cloudflare
+						に届き、国の推定に使われます。アクセス解析のデータとして Cloudflare
+						のサーバーに保存されるのは、上の項目と推定した国です。Cloudflare
+						は、このサービスで閲覧者の個人データを集めないとしています。Cloudflare
+						での情報の扱いは、
+						<a href="https://www.cloudflare.com/privacypolicy/" rel="noopener noreferrer">
+							Cloudflare のプライバシーポリシー
+						</a>
+						をご覧ください。
+					</p>
+				</>
 			) : (
 				<p>現在、このサイトではアクセス解析を行っていません。</p>
 			)}
 
+			<h2 id="server-logs">サーバーのログ</h2>
+			<p>
+				このサイトは Cloudflare, Inc. の「Cloudflare Workers」で動いています。Worker
+				に届いたリクエストの記録（日時、メソッド、URL など）は、不具合の調査のために Cloudflare
+				のログ（Workers Logs）に残ります。ページを Cloudflare
+				のキャッシュから返したときは、そのアクセス自体は Worker
+				に届かないので記録されません。ただし、キャッシュを新しくするために Cloudflare が裏で Worker
+				を呼ぶことがあり、そのときはページの URL
+				と日時が記録されます。アクセス解析と違い、JavaScript
+				を無効にしていても記録の対象になります。このログは数日（最長 7
+				日）で自動的に削除されます。Cloudflare での情報の扱いは、
+				<a href="https://www.cloudflare.com/privacypolicy/" rel="noopener noreferrer">
+					Cloudflare のプライバシーポリシー
+				</a>
+				をご覧ください。
+			</p>
+
+			<h2 id="cookies">Cookie の利用</h2>
+			<p>
+				このサイトのアクセス解析は、Cookie や localStorage を使いません。閲覧者を識別する ID
+				をブラウザに保存しないので、日をまたいで同じ閲覧者を追跡することもありません。
+			</p>
+
 			<h2 id="use">取得した情報の使い道</h2>
 			<p>
-				取得した情報は、サイトの改善と不具合の調査にだけ使います。個人を特定する目的では使わず、法令に基づく場合を除いて第三者に提供しません。
+				取得した情報は、サイトの改善と不具合の調査にだけ使い、個人を特定する目的では使いません。上で説明したとおり、情報はサービスの提供者である
+				Cloudflare
+				のサーバーに送られて保存されます。それ以外に、運営者が法令に基づく場合を除いて第三者に提供することはありません。
 			</p>
 
 			<h2 id="contact">お問い合わせ</h2>
 			<p>
-				取得した情報の開示・訂正・削除・利用の停止のご希望や、このポリシーについてのご質問は、
+				このポリシーについてのご質問は、
 				<a href={CONTACT.url} rel="noopener noreferrer">
 					{CONTACT.label}
 				</a>
@@ -148,20 +116,5 @@ const posthogRegion = posthogConfig ? getPostHogRegion(posthogConfig.apiHost) : 
 	.prose {
 		max-width: var(--measure);
 		margin: 3rem auto 0;
-	}
-	.consent-panel {
-		margin: 1.5rem 0;
-		padding: 1.25rem 1.5rem;
-		border: 1px solid var(--line-strong);
-		border-radius: 8px;
-	}
-	.consent-panel p {
-		margin: 0;
-	}
-	.consent-panel [data-consent-settings] p {
-		margin-bottom: 1rem;
-	}
-	.consent-panel [hidden] {
-		display: none;
 	}
 </style>

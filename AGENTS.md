@@ -96,7 +96,7 @@ Cloudflare Workers + Hyperdrive (PostgreSQL) + R2. See README.md. Use Wrangler f
 - When Astro's cache is enabled, pass content-query hints to `Astro.cache.set(cacheHint)`. Use the `WithCacheHint` variants for site settings, menus, taxonomies, and widget areas rendered by cached routes.
 - Run `pnpm format` and `pnpm lint` before committing; CI fails on unformatted files and on lint warnings.
   Config: `.oxfmtrc.json` (tabs, Astro via `@astrojs/compiler-rs`) and `.oxlintrc.json`. Keep vendored code
-  as is with `// prettier-ignore` / `// oxlint-disable-next-line -- reason` (e.g. the PostHog snippet in `posthog.astro`).
+  as is with `// prettier-ignore` / `// oxlint-disable-next-line -- reason`.
 - Imports in `src/` use the `@/` alias (`@/*` → `src/*`, `tsconfig.json` `paths`) instead of `../`; Oxlint
   (`import/no-relative-parent-imports`) rejects parent-relative imports there. `./` for the same directory is fine.
   Exception: `node --test` (`scripts/*.test.mjs`) does not know the alias, so modules the tests import
@@ -119,7 +119,7 @@ Cloudflare Workers deployment. Extend the existing design tokens instead of intr
 | Page        | `/[slug]`          | Static page content (e.g. `/about`); `/home` redirects to `/`        |
 | Category    | `/category/[slug]` | Posts filtered by category (hierarchical; lookup walks the tree)     |
 | Tag         | `/tag/[slug]`      | Posts filtered by tag                                                |
-| Privacy     | `/privacy`         | Privacy policy + cookie settings (static text in code, not the CMS)  |
+| Privacy     | `/privacy`         | Privacy policy (static text in code, not the CMS)                    |
 
 ## Schema
 
@@ -146,14 +146,14 @@ Post and page detail pages show a Notion-style table of contents on the right (`
 hover only): `getTocHeadings()` in `src/utils/toc.ts` collects h2–h4, and `AnchoredBlock.astro` adds the matching `id`s
 to the headings rendered by `PortableText`. `Base.astro` has a `footer` slot for the
 link on the right of the footer (pager, "ブログ一覧へ →").
-Analytics: PostHog (`src/components/posthog.astro`, only when `PUBLIC_POSTHOG_*` are set at build time) with
-`cookieless_mode: "on_reject"`. In production the browser SDK talks to `/_relay/*` on this domain, which `src/worker.ts`
-forwards to PostHog (`src/utils/posthog-proxy.ts`), so tracker blockers that block `*.posthog.com` don't stop it. Visitors are counted cookielessly until they accept the cookie banner
-(`CookieConsent.astro`); accepting enables cookies and session replay. `src/scripts/consent.ts` drives the banner and the
-settings on `/privacy`. Error tracking: browser exceptions via `capture_exceptions`; SSR exceptions via `src/middleware.ts` →
-`src/utils/server-errors.ts` (`posthog-node`, edge build). `deploy.yml` uploads client source maps when the
-`POSTHOG_CLI_API_KEY` secret is set (`CLIENT_SOURCEMAPS=true` builds them; they are deleted before deploy).
-When you change what PostHog collects, update the text of `src/pages/privacy.astro` too.
+Analytics: Cloudflare Web Analytics (`src/components/CloudflareWebAnalytics.astro`, at the end of `<body>` in `Base.astro`).
+It renders only in production builds with `PUBLIC_CF_WEB_ANALYTICS_TOKEN` set (`deploy.yml` passes the GitHub Actions
+variable), so PR previews and the dev server send nothing. It uses no cookies or localStorage, so there is no consent banner.
+Editor views (draft previews, visual editing; `isEditorView()` in `src/utils/editor-view.ts`) leave the beacon out and set
+`<meta name="referrer" content="no-referrer">`, so unpublished URLs never reach Cloudflare.
+The site in the Cloudflare dashboard uses the JS snippet, not automatic injection (both would count page views twice).
+Server errors go to Workers Logs (`observability` in `wrangler.jsonc`). When you change what is collected, update the
+text of `src/pages/privacy.astro` too.
 Design tokens live in `src/styles/theme.css` (imported by `Base.astro`), with light/dark via `prefers-color-scheme`.
 Page-specific styles go in each page's `<style>` block and reference the CSS variables.
 Don't add component libraries without a reason; the site is small on purpose.

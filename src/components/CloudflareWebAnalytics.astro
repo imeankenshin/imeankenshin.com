@@ -1,0 +1,20 @@
+---
+// Cloudflare Web Analytics のビーコン。Base.astro の </body> の直前で 1 回だけ描画する。
+// Cookie も localStorage も使わないので、同意バナーは要らない。
+// 計測の内容を変えたら src/pages/privacy.astro の文面も更新する。
+import { webAnalyticsToken } from "@/utils/analytics";
+import { isEditorView } from "@/utils/editor-view";
+
+// 下書きのプレビュー・編集では出さない。未公開の記事のパスや画像の URL を Cloudflare に送らず、
+// 編集中の閲覧も数えない
+const token = isEditorView(Astro.url) ? null : webAnalyticsToken;
+---
+
+{token && (
+	<script
+		is:inline
+		type="module"
+		src="https://static.cloudflareinsights.com/beacon.min.js"
+		data-cf-beacon={JSON.stringify({ token })}
+	></script>
+)}

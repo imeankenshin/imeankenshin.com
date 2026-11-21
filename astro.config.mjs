@@ -32,7 +32,7 @@ export default defineConfig({
 		"/[slug]": { ...publicCache, tags: ["pages"] },
 		"/category/[slug]": { ...publicCache, tags: ["posts"] },
 		"/tag/[slug]": { ...publicCache, tags: ["posts"] },
-		// Static text in code; the layout adds its own settings/menu hints. The consent UI is client-side.
+		// Static text in code; the layout adds its own settings/menu hints.
 		"/privacy": publicCache,
 		// These injected endpoints also match /[slug]; give them their own dependencies.
 		"/sitemap.xml": { ...publicCache, tags: ["posts", "pages", "emdash:settings"] },
@@ -89,9 +89,6 @@ export default defineConfig({
 		// （ないと "require is not defined" で 500 になる）
 		environments: {
 			ssr: { optimizeDeps: { include: ["pg"] } },
-			// ブラウザ向けのソースマップ。本番デプロイ（deploy.yml）が PostHog の Error tracking に
-			// アップロードしてから削除するときだけ作る。ほかのビルドで .map を公開しない
-			client: { build: { sourcemap: process.env.CLIENT_SOURCEMAPS === "true" } },
 		},
 		// Vite DevTools（https://devtools.vite.dev）。開発サーバーでのみ有効にし、本番ビルドには含めない
 		devtools: { apply: "serve" },
