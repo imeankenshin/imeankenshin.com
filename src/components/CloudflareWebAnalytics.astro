@@ -3,13 +3,18 @@
 // Cookie も localStorage も使わないので、同意バナーは要らない。
 // 計測の内容を変えたら src/pages/privacy.astro の文面も更新する。
 import { webAnalyticsToken } from "@/utils/analytics";
+
+// 管理画面からの下書きのプレビュー・編集（src/middleware.ts と同じ判定）では出さない。
+// 未公開の記事のパスや画像の URL を Cloudflare に送らず、編集中の閲覧も数えない
+const isEditorView = Astro.url.searchParams.has("_preview") || Astro.url.searchParams.has("_edit");
+const token = isEditorView ? null : webAnalyticsToken;
 ---
 
-{webAnalyticsToken && (
+{token && (
 	<script
 		is:inline
 		type="module"
 		src="https://static.cloudflareinsights.com/beacon.min.js"
-		data-cf-beacon={JSON.stringify({ token: webAnalyticsToken })}
+		data-cf-beacon={JSON.stringify({ token })}
 	></script>
 )}
