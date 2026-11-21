@@ -5,6 +5,7 @@ import { hyperdrive, r2 } from "@emdash-cms/cloudflare";
 import { defineConfig, fontProviders } from "astro/config";
 import emdash from "emdash/astro";
 import { viteDevtoolsAstroBuild } from "./scripts/vite-devtools-astro-build.mjs";
+import { viteEmdashAdminLazyIcons } from "./scripts/vite-emdash-admin-lazy-icons.mjs";
 
 const publicCache = { maxAge: 300, swr: 86_400 };
 
@@ -92,7 +93,11 @@ export default defineConfig({
 		},
 		// Vite DevTools（https://devtools.vite.dev）。開発サーバーでのみ有効にし、本番ビルドには含めない
 		devtools: { apply: "serve" },
-		// DevTools の Rolldown パネルの「Run build」で vite build ではなく astro build を実行する
-		plugins: [viteDevtoolsAstroBuild()],
+		plugins: [
+			// DevTools の Rolldown パネルの「Run build」で vite build ではなく astro build を実行する
+			viteDevtoolsAstroBuild(),
+			// 管理画面が Phosphor の全アイコンを最初に読み込むのを防ぐ（詳細はファイル冒頭のコメント）
+			viteEmdashAdminLazyIcons(),
+		],
 	},
 });
