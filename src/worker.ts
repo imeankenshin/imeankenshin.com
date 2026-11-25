@@ -20,5 +20,6 @@ export default {
 		response.headers.set("X-Robots-Tag", "noindex, nofollow");
 		return response;
 	},
-	scheduled: createScheduledHandler(),
+	// wrangler.jsonc の triggers.crons と同じ式にする（違う式の実行は無視される）
+	scheduled: createScheduledHandler({ generalCron: "0 * * * *" }),
 } satisfies ExportedHandler;

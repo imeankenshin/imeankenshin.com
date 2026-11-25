@@ -26,9 +26,11 @@
 			"bucket_name": "imeankenshin-media",
 		},
 	],
-	// 予約公開・メンテナンス用（src/worker.ts の scheduled ハンドラ）
+	// 予約公開・メンテナンス用（src/worker.ts の scheduled ハンドラ）。
+	// 毎分だと Neon の compute が止まらず無料枠を超えるので 1 時間ごと。
+	// 変更するときは src/worker.ts の generalCron も同じ式にする。
 	"triggers": {
-		"crons": ["* * * * *"],
+		"crons": ["0 * * * *"],
 	},
 	"observability": { "enabled": true },
 	// Worker を Neon (aws-ap-southeast-1) の近くで動かす
