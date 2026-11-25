@@ -9,7 +9,7 @@ Kenshin の個人サイト＋ブログ。[EmDash](https://docs.emdashcms.com/)�
 | ランタイム   | Cloudflare Workers（`@astrojs/cloudflare`）     | 同じ Worker ランタイム（`astro dev`）     |
 | DB           | PostgreSQL（任意のプロバイダ）← Hyperdrive 経由 | Docker の PostgreSQL 17（`compose.yaml`） |
 | メディア     | R2（`MEDIA` バインディング）                    | ローカル R2 シミュレーション              |
-| 予約公開など | Cron Trigger（毎分）→ `src/worker.ts`           | dev サーバーのタイマー                    |
+| 予約公開など | Cron Trigger（1 時間ごと）→ `src/worker.ts`     | dev サーバーのタイマー                    |
 
 ## ローカル開発
 
